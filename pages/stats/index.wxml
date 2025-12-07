@@ -1,0 +1,104 @@
+<view class="container" bindtap="closeDropdown">
+  
+  <view class="header-row">
+    <view class="header-left">
+      <view class="title">数据中心</view>
+      <view class="subtitle">让坚持看得见</view>
+    </view>
+    
+    <view class="filter-trigger" catchtap="toggleDropdown" wx:if="{{categories.length > 0}}">
+      <text class="filter-text">{{currentCategory}}</text>
+      <view class="arrow-icon {{showDropdown ? 'up' : ''}}">▼</view>
+    </view>
+  </view>
+
+  <view class="dropdown-menu {{showDropdown ? 'show' : ''}}" catchtap="stopProp">
+    <view class="dropdown-item {{currentCategory === '全部' ? 'active' : ''}}" bindtap="switchCategory" data-cat="全部">全部</view>
+    <block wx:for="{{categories}}" wx:key="*this">
+      <view class="dropdown-item {{currentCategory === item ? 'active' : ''}}" bindtap="switchCategory" data-cat="{{item}}">{{item}}</view>
+    </block>
+  </view>
+
+  <view class="mode-switch-container">
+    <view class="mode-switch-box">
+      <view class="mode-btn {{displayMode === 'trend' ? 'active' : ''}}" bindtap="switchDisplayMode" data-mode="trend">📅 趋势追踪</view>
+      <view class="mode-btn {{displayMode === 'time' ? 'active' : ''}}" bindtap="switchDisplayMode" data-mode="time">🕘 时段分布</view>
+    </view>
+  </view>
+
+  <view class="tabs-wrapper">
+    <view class="tabs-box">
+      <view class="tab {{currentView === 'week' ? 'active' : ''}}" bindtap="switchView" data-view="week">本周</view>
+      <view class="tab {{currentView === 'month' ? 'active' : ''}}" bindtap="switchView" data-view="month">本月</view>
+      <view class="tab {{currentView === 'year' ? 'active' : ''}}" bindtap="switchView" data-view="year">本年</view>
+    </view>
+  </view>
+
+  <view class="time-tip" wx:if="{{displayMode === 'time'}}">
+    <text>{{currentView === 'week' ? '本周' : (currentView === 'month' ? '本月' : '今年')}}活跃时段 · 平滑曲线</text>
+  </view>
+
+  <scroll-view scroll-y class="grid-scroll">
+    <view class="stats-grid">
+      <block wx:for="{{filteredHabits}}" wx:key="id" wx:for-item="habit">
+        <view class="stat-card" bindtap="goToDetail" data-id="{{habit.id}}">
+          
+          <view class="card-header">
+            <view class="icon-box" style="background: {{habit.color}}15;">{{habit.icon}}</view>
+            <view class="name-box">
+              <view class="name">{{habit.name}}</view>
+              <view class="count-text" style="color: {{habit.color}}" wx:if="{{displayMode === 'trend'}}">
+                {{currentView === 'week' ? habit.weekTotal : (currentView === 'month' ? habit.monthTotal : habit.yearTotal)}} 
+                <text class="unit-text">次</text>
+              </view>
+              <view class="category-tag" wx:else>{{habit.category || '默认'}}</view>
+            </view>
+          </view>
+
+          <view class="chart-area">
+            
+            <block wx:if="{{displayMode === 'trend'}}">
+              <view class="chart-week" wx:if="{{currentView === 'week'}}">
+                <block wx:for="{{habit.weekData}}" wx:key="date" wx:for-item="day">
+                  <view class="week-col">
+                    <view class="bar-track">
+                       <view class="bar-active" style="height: {{day.heightPct < 10 && day.count > 0 ? 10 : day.heightPct}}%; background: {{day.count > 0 ? habit.color : '#f0f2f5'}};"></view>
+                    </view>
+                    <text class="day-label">{{day.weekDay}}</text>
+                  </view>
+                </block>
+              </view>
+              <view class="chart-month" wx:if="{{currentView === 'month'}}">
+                 <block wx:for="{{habit.monthData}}" wx:key="date" wx:for-item="day">
+                    <view class="month-pixel" style="background: {{day.count > 0 ? habit.color : '#f0f2f5'}}; opacity: {{day.count > 0 ? day.opacity : 1}};"></view>
+                 </block>
+              </view>
+              <view class="chart-year" wx:if="{{currentView === 'year'}}">
+                 <block wx:for="{{habit.yearData}}" wx:key="month" wx:for-item="monthBlock">
+                    <view class="year-block" style="background: {{monthBlock.count > 0 ? habit.color : '#f5f6fa'}}; opacity: {{monthBlock.count > 0 ? monthBlock.opacity : 1}};">
+                      <text class="year-month-num" style="color: {{monthBlock.count > 0 ? '#fff' : '#ccc'}}">{{index + 1}}</text>
+                    </view>
+                 </block>
+              </view>
+            </block>
+
+            <block wx:if="{{displayMode === 'time'}}">
+               <view class="chart-time-curve">
+                  <ec-canvas id="chart-time-{{habit.id}}" canvas-id="chart-time-{{habit.id}}" ec="{{ habit.ec }}"></ec-canvas>
+               </view>
+            </block>
+
+          </view>
+        </view>
+      </block>
+    </view>
+    
+    <view class="empty-state" wx:if="{{filteredHabits.length === 0}}">
+      <view class="empty-text">
+        {{currentCategory === '全部' ? '暂无数据' : '“' + currentCategory + '”下暂无习惯'}}
+      </view>
+    </view>
+    
+    <view style="height: 40px;"></view>
+  </scroll-view>
+</view>

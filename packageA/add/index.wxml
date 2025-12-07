@@ -1,0 +1,73 @@
+<view class="container">
+  <view class="page-title">新建习惯</view>
+
+  <view class="section">
+    <view class="label">习惯名称</view>
+    <input class="input-box" placeholder="例如：背单词" placeholder-class="ph-style" bindinput="bindNameInput" />
+  </view>
+
+  <view class="section">
+    <view class="label">所属分类</view>
+    <view class="category-list">
+      <view 
+        wx:for="{{categoryList}}" wx:key="*this"
+        class="cat-item {{category === item ? 'active' : ''}}"
+        bindtap="selectCategory" data-item="{{item}}"
+        style="{{category === item ? 'background:'+selectedColor+'; border-color:'+selectedColor : ''}}"
+      >
+        {{item}}
+      </view>
+      <view class="cat-item add-btn" bindtap="toggleAddCategory" wx:if="{{!showAddCategory}}">+</view>
+    </view>
+    
+    <view class="add-cat-box" wx:if="{{showAddCategory}}">
+      <input class="cat-input" placeholder="输入新分类" focus="{{true}}" bindinput="bindCategoryInput" />
+      <view class="cat-confirm" bindtap="confirmAddCategory" style="color: {{selectedColor}}">确定</view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="label">选择图标 <text wx:if="{{icon}}" style="font-size:18px; margin-left:10px;">当前: {{icon}}</text></view>
+    <view class="emoji-grid">
+      <view 
+        wx:for="{{emojis}}" 
+        wx:key="*this"
+        bindtap="selectEmoji"
+        data-emoji="{{item}}"
+        class="emoji-item {{icon === item ? 'selected' : ''}}"
+        style="border-color: {{icon === item ? selectedColor : 'transparent'}}; background: {{icon === item ? selectedColor + '20' : '#fff'}};"
+      >
+        {{item}}
+      </view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="label">主题颜色</view>
+    <view class="color-scroll">
+      <view 
+        wx:for="{{colors}}" 
+        wx:key="*this" 
+        bindtap="selectColor" 
+        data-color="{{item}}"
+        class="color-item {{selectedColor === item ? 'active' : ''}}" 
+        style="background: {{item}};">
+        <view wx:if="{{selectedColor === item}}" class="check-mark">✓</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="label">每日打卡目标</view>
+    <view class="stepper-box">
+      <view class="stepper-btn" bindtap="decreaseGoal">-</view>
+      <view class="stepper-num" style="color: {{selectedColor}}">{{goal}}</view>
+      <view class="stepper-btn" bindtap="increaseGoal">+</view>
+      <text class="unit">次/天</text>
+    </view>
+  </view>
+
+  <button class="save-btn" bindtap="saveHabit" style="background: {{selectedColor}}; box-shadow: 0 8px 20px {{selectedColor}}60;">
+    开始坚持
+  </button>
+</view>

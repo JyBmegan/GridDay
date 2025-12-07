@@ -1,0 +1,50 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/stats/index",
+    "pages/plan/index"
+  ],
+  "subpackages": [
+    {
+      "root": "packageA",
+      "pages": [
+        "add/index",
+        "detail/index"
+      ]
+    }
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#FAFBFC",
+    "navigationBarTitleText": "Habit Tracker",
+    "navigationBarTextStyle": "black"
+  },
+  "tabBar": {
+    "color": "#BFBFBF",
+    "selectedColor": "#2D3436",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "打卡",
+        "iconPath": "images/tab_home.png",
+        "selectedIconPath": "images/tab_home_active.png"
+      },
+      {
+        "pagePath": "pages/stats/index",
+        "text": "数据",
+        "iconPath": "images/tab_stats.png",
+        "selectedIconPath": "images/tab_stats_active.png"
+      },
+      {
+        "pagePath": "pages/plan/index",
+        "text": "计划",
+        "iconPath": "images/tab_plan.png",
+        "selectedIconPath": "images/tab_plan_active.png"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

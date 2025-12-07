@@ -1,0 +1,71 @@
+/* 全局容器 */
+.container { padding: 0; background-color: #FAFBFC; height: 100vh; display: flex; flex-direction: column; position: relative; }
+
+/* 1. 头部左右布局 */
+.header-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 20px 24px 10px; background: #fff; z-index: 101; position: relative; }
+.header-left { display: flex; flex-direction: column; }
+.title { font-size: 24px; font-weight: 800; color: #2D3436; }
+.subtitle { font-size: 12px; color: #b2bec3; margin-top: 4px; }
+
+/* 2. 筛选按钮 */
+.filter-trigger { display: flex; align-items: center; gap: 6px; background: #f8f9fa; padding: 6px 12px; border-radius: 16px; border: 1px solid #eee; transition: all 0.2s; }
+.filter-trigger:active { background: #f0f0f0; }
+.filter-text { font-size: 13px; font-weight: 600; color: #666; }
+.arrow-icon { font-size: 10px; color: #999; }
+.arrow-icon.up { transform: rotate(180deg); }
+
+/* 3. 下拉菜单 */
+.dropdown-menu { position: absolute; top: 60px; right: 20px; width: 120px; background: white; border-radius: 16px; padding: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); transform: scale(0.9); opacity: 0; pointer-events: none; transform-origin: top right; transition: all 0.2s; z-index: 102; }
+.dropdown-menu.show { transform: scale(1); opacity: 1; pointer-events: auto; }
+.dropdown-item { padding: 10px; font-size: 13px; color: #666; border-radius: 8px; text-align: center; }
+.dropdown-item.active { background: #f0f2f5; color: #333; font-weight: bold; }
+
+/* 4. 模式切换 */
+.mode-switch-container { padding: 0 20px; background: #fff; }
+.mode-switch-box { background: #e0e4e7; border-radius: 12px; padding: 4px; display: flex; }
+.mode-btn { flex: 1; text-align: center; font-size: 14px; padding: 8px 0; color: #999; border-radius: 10px; font-weight: 600; transition: all 0.3s; }
+.mode-btn.active { background: #fff; color: #333; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+
+/* 5. Tabs */
+.tabs-wrapper { background: #fff; padding-top: 10px; }
+.tabs-box { display: flex; padding: 0 24px 10px; background: #fff; gap: 24px; }
+.tab { font-size: 14px; color: #999; font-weight: 600; padding: 6px 0; transition: all 0.3s; }
+.tab.active { color: #333; font-size: 16px; border-bottom: 2px solid #333; }
+
+.time-tip { padding: 10px 24px; font-size: 12px; color: #b2bec3; text-align: center; }
+
+/* 6. Grid */
+.grid-scroll { flex: 1; padding: 10px 20px; box-sizing: border-box; }
+.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.stat-card { background: white; border-radius: 18px; padding: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); display: flex; flex-direction: column; height: 170px; }
+.stat-card:active { transform: scale(0.98); }
+
+.card-header { display: flex; align-items: flex-start; gap: 10px; height: 40px; margin-bottom: 15px; }
+.icon-box { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+.name-box { overflow: hidden; display: flex; flex-direction: column; justify-content: center; }
+.name { font-size: 14px; font-weight: bold; color: #2d3436; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.count-text { font-size: 16px; font-weight: 800; margin-top: 4px; }
+.unit-text { font-size: 10px; opacity: 0.6; font-weight: normal; }
+.category-tag { font-size: 10px; color: #999; background: #f5f5f5; padding: 2px 6px; border-radius: 4px; align-self: flex-start; margin-top: 4px; }
+
+.chart-area { flex: 1; width: 100%; position: relative; }
+
+/* 图表样式 */
+.chart-week { width: 100%; height: 100%; display: flex; justify-content: space-between; align-items: flex-end; }
+.week-col { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
+.bar-track { width: 8px; height: 60px; background: transparent; display: flex; align-items: flex-end; position: relative; }
+.bar-track::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 4px; background: #f5f6fa; border-radius: 4px; }
+.bar-active { width: 100%; border-radius: 4px; transition: height 0.3s; z-index: 1; }
+.day-label { font-size: 8px; color: #ccc; }
+
+.chart-month { width: 100%; height: 100%; display: grid; grid-template-columns: repeat(7, 1fr); align-content: end; gap: 4px; }
+.month-pixel { aspect-ratio: 1; border-radius: 3px; background: #f0f2f5; width: 100%; }
+
+.chart-year { width: 100%; height: 100%; display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(3, 1fr); gap: 6px; align-content: end; }
+.year-block { width: 100%; height: 100%; border-radius: 4px; background: #f5f6fa; display: flex; align-items: center; justify-content: center; }
+.year-month-num { font-size: 10px; font-weight: bold; }
+
+/* 时段曲线 */
+.chart-time-curve { width: 100%; height: 100%; }
+.empty-state { display: flex; justify-content: center; padding-top: 40px; }
+.empty-text { font-size: 12px; color: #ccc; }

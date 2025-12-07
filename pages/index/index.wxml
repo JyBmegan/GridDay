@@ -1,0 +1,82 @@
+<view class="container" bindtap="closeDropdown">
+  
+  <view class="header-row">
+    <view class="header-left">
+      <view class="title-date">Habit Tracker</view>
+      <view class="subtitle">Focus on your day</view>
+    </view>
+
+    <view class="filter-trigger" catchtap="toggleDropdown" wx:if="{{categories.length > 0}}">
+      <text class="filter-text">{{currentCategory}}</text>
+      <view class="arrow-icon {{showDropdown ? 'up' : ''}}">▼</view>
+    </view>
+  </view>
+
+  <view class="dropdown-menu {{showDropdown ? 'show' : ''}}" catchtap="stopProp">
+    <view 
+      class="dropdown-item {{currentCategory === '全部' ? 'active' : ''}}" 
+      bindtap="switchCategory" 
+      data-cat="全部">
+      全部
+    </view>
+    <block wx:for="{{categories}}" wx:key="*this">
+      <view 
+        class="dropdown-item {{currentCategory === item ? 'active' : ''}}" 
+        bindtap="switchCategory" 
+        data-cat="{{item}}">
+        {{item}}
+      </view>
+    </block>
+  </view>
+
+  <view class="grid-container" wx:if="{{filteredHabits.length > 0}}">
+    <block wx:for="{{filteredHabits}}" wx:key="id" wx:for-item="habit">
+      <view class="habit-card" bindtap="goToDetail" data-id="{{habit.id}}">
+        <view class="card-header">
+          <view class="icon-title-row">
+            <view class="icon-box" style="background: {{habit.color}}15;"><text>{{habit.icon}}</text></view>
+            <text class="habit-name">{{habit.name}}</text>
+          </view>
+          <view class="check-btn-wrap" catchtap="checkIn" data-id="{{habit.id}}" style="background: {{habit.count >= habit.goal ? habit.color : '#f1f2f6'}};">
+             <text style="color: {{habit.count >= habit.goal ? 'white' : '#dcdde1'}}; font-weight: bold;">✓</text>
+          </view>
+        </view>
+        <view class="heatmap-container">
+          <view class="heatmap-week-col" wx:for="{{habit.heatmap}}" wx:key="index" wx:for-item="week">
+            <view class="heat-box level-{{day.level}} {{day.isToday ? 'today' : ''}}" wx:for="{{week}}" wx:key="date" wx:for-item="day" style="{{day.level > 0 ? 'background-color:' + habit.color + '; opacity:' + (0.3 + day.level * 0.15) : ''}}"></view>
+          </view>
+        </view>
+        <view class="card-footer-text">
+           <text style="color: #999; font-size: 11px;">{{habit.category || '默认'}}</text>
+           <text style="color: {{habit.color}}; font-weight: bold; margin-left: 5px;">今日: {{habit.count}}次</text>
+        </view>
+      </view>
+    </block>
+  </view>
+
+  <view class="empty-state" wx:else>
+    <view class="empty-text">
+      {{currentCategory === '全部' ? '还没有习惯，去添加一个吧 🌱' : '“' + currentCategory + '”分类下暂无习惯'}}
+    </view>
+  </view>
+
+  <view class="fab-btn" bindtap="goToAdd">+</view>
+
+  <view class="modal-mask" wx:if="{{showModal}}" bindtap="closeModal">
+    <view class="modal-card" catchtap="stopProp">
+      <view class="modal-header">
+        <view class="modal-icon">{{currentHabit.icon}}</view>
+        <view class="modal-title">完成打卡！</view>
+      </view>
+      <view class="modal-body">
+        <view class="modal-name">{{currentHabit.name}}</view>
+        <view class="modal-time"><text class="label">打卡时间</text><text class="value">{{currentTime}}</text></view>
+        <view class="modal-input-box">
+          <input class="modal-input" placeholder="写一句小记... (可选)" placeholder-style="color:#ccc" bindinput="bindNoteInput" value="{{note}}"/>
+        </view>
+      </view>
+      <button class="confirm-btn" bindtap="confirmCheckIn" style="background: {{currentHabit.color}};">确认记录</button>
+    </view>
+  </view>
+
+</view>

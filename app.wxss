@@ -1,0 +1,40 @@
+/* 全局样式 */
+page {
+  /* 之前是 #F6F7F9 (冷灰)，现在换成 #F2F5F8 (更柔和) 或 #FFFBF0 (暖白) */
+  /* 这里我们选一种干净通透的颜色 */
+  background-color: #FAFBFC; 
+  
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, sans-serif;
+}
+
+/* 全局卡片去掉了沉重的阴影，改为更轻盈的风格 */
+.card {
+  background: #ffffff;
+  border-radius: 24px; /* 更圆润的角 */
+  padding: 20px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04); /* 更柔和、扩散的阴影 */
+}
+
+/* 浮动按钮改为渐变色，更吸睛 */
+.fab-btn {
+  position: fixed;
+  bottom: 40px;
+  right: 24px;
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #333, #000); /* 保持黑色高级感，但加点质感 */
+  border-radius: 30px; /* 完美圆形 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+  z-index: 100;
+  color: white;
+  font-size: 32px;
+  font-weight: 300;
+  transition: transform 0.1s;
+}
+
+.fab-btn:active {
+  transform: scale(0.9); /* 点击时缩小一点点，有按压感 */
+}

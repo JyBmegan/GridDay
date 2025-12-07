@@ -1,0 +1,80 @@
+.container { 
+  padding: 24px 20px; padding-bottom: 100px; 
+  position: relative; /* 为下拉菜单定位做准备 */
+}
+
+/* 1. 头部改为 Flex 左右布局 */
+.header-row {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  margin-bottom: 24px; position: relative; z-index: 101;
+}
+.header-left { display: flex; flex-direction: column; }
+.title-date { font-size: 28px; font-weight: 800; color: #333; }
+.subtitle { font-size: 14px; color: #999; margin-top: 4px; }
+
+/* 2. 筛选按钮样式 */
+.filter-trigger {
+  display: flex; align-items: center; gap: 6px;
+  background: #fff; padding: 8px 12px; border-radius: 20px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 1px solid #f0f0f0;
+  transition: all 0.2s;
+}
+.filter-trigger:active { transform: scale(0.95); background: #f8f8f8; }
+.filter-text { font-size: 14px; font-weight: 600; color: #333; }
+.arrow-icon { font-size: 10px; color: #999; transition: transform 0.3s; }
+.arrow-icon.up { transform: rotate(180deg); }
+
+/* 3. 下拉菜单样式 */
+.dropdown-menu {
+  position: absolute; top: 70px; right: 20px; width: 140px;
+  background: white; border-radius: 16px; padding: 8px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  transform: scale(0.9); opacity: 0; pointer-events: none; /* 默认隐藏 */
+  transform-origin: top right;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  z-index: 102;
+}
+.dropdown-menu.show {
+  transform: scale(1); opacity: 1; pointer-events: auto; /* 显示 */
+}
+
+.dropdown-item {
+  padding: 12px 16px; font-size: 14px; color: #666; border-radius: 12px;
+  text-align: center; margin-bottom: 4px; transition: background 0.2s;
+}
+.dropdown-item:active { background: #f5f5f5; }
+.dropdown-item.active { background: #f0f2f5; color: #333; font-weight: bold; }
+
+/* ... 以下保留原有的卡片和弹窗样式 (完全不用动) ... */
+.grid-container { display: grid; grid-template-columns: 1fr; gap: 20px; }
+.habit-card { background: white; border-radius: 24px; padding: 20px; box-shadow: 0 8px 24px rgba(0,0,0,0.04); }
+.card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.icon-title-row { display: flex; align-items: center; gap: 12px; }
+.icon-box { width: 42px; height: 42px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+.habit-name { font-size: 17px; font-weight: 700; color: #333; }
+.check-btn-wrap { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: transform 0.1s; }
+.check-btn-wrap:active { transform: scale(0.9); }
+.heatmap-container { display: flex; gap: 3px; margin-bottom: 12px; overflow-x: auto; padding-bottom: 5px; -webkit-overflow-scrolling: touch; }
+.heatmap-container::-webkit-scrollbar { display: none; }
+.heatmap-week-col { display: flex; flex-direction: column; gap: 3px; }
+.heat-box { width: 9px; height: 9px; border-radius: 2px; background-color: #f0f2f5; transition: all 0.3s; }
+.heat-box.today { border: 1px solid #ccc; box-sizing: border-box; }
+.card-footer-text { display: flex; justify-content: space-between; font-size: 12px; }
+.empty-state { display: flex; justify-content: center; padding-top: 60px; color: #ccc; }
+.fab-btn { position: fixed; bottom: 40px; right: 24px; width: 60px; height: 60px; background: linear-gradient(135deg, #333, #000); border-radius: 30px; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 25px rgba(0,0,0,0.3); z-index: 100; color: white; font-size: 32px; transition: transform 0.1s; }
+.fab-btn:active { transform: scale(0.9); }
+.modal-mask { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(4px); z-index: 999; display: flex; align-items: center; justify-content: center; }
+.modal-card { width: 80%; background: white; border-radius: 24px; padding: 30px 24px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 10px 40px rgba(0,0,0,0.15); animation: popUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; transform: scale(0); }
+@keyframes popUp { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+.modal-header { margin-bottom: 20px; text-align: center; }
+.modal-icon { font-size: 48px; margin-bottom: 10px; }
+.modal-title { font-size: 20px; font-weight: 800; color: #333; }
+.modal-body { width: 100%; margin-bottom: 24px; }
+.modal-name { text-align: center; font-size: 16px; color: #666; margin-bottom: 20px; }
+.modal-time { display: flex; justify-content: space-between; background: #f8f9fa; padding: 12px 16px; border-radius: 12px; margin-bottom: 12px; }
+.label { color: #999; font-size: 14px; }
+.value { color: #333; font-weight: bold; font-size: 14px; font-family: monospace; }
+.modal-input-box { background: #f8f9fa; padding: 12px 16px; border-radius: 12px; }
+.modal-input { font-size: 14px; color: #333; width: 100%; }
+.confirm-btn { width: 100%; border-radius: 30px; color: white; font-weight: bold; font-size: 16px; padding: 12px 0; box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
+.confirm-btn:active { transform: scale(0.98); opacity: 0.9; }

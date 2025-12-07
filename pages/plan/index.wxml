@@ -1,0 +1,25 @@
+<view class="container">
+  <view class="header">
+    <view class="title">每日计划</view>
+    <view class="date">{{todayStr}}</view>
+  </view>
+
+  <view class="task-list">
+    <block wx:for="{{habits}}" wx:key="id">
+      <view class="task-item">
+        <view class="task-left">
+          <view class="time-dot" style="background: {{item.color}};"></view>
+          <view class="task-info">
+            <view class="name">{{item.name}}</view>
+            <view class="sub">目标: {{item.goal}} 次</view>
+          </view>
+        </view>
+        <view class="status {{item.count >= item.goal ? 'done' : ''}}">
+          {{item.count >= item.goal ? '已完成' : '进行中'}}
+        </view>
+      </view>
+    </block>
+    
+    <view wx:if="{{habits.length === 0}}" class="empty">暂无计划，去首页添加吧</view>
+  </view>
+</view>

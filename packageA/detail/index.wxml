@@ -1,0 +1,85 @@
+<view class="container">
+  
+  <view class="header-simple">
+    <view class="big-icon">{{habit.icon}}</view>
+    <view class="big-name">{{habit.name}}</view>
+  </view>
+
+  <view class="card">
+    <view class="card-header">
+      <view class="card-title">本周概览</view>
+    </view>
+    
+    <view class="chart-container">
+       <ec-canvas id="mychart-week" canvas-id="mychart-week" ec="{{ ec }}"></ec-canvas>
+    </view>
+    
+    <view class="stats-grid">
+      <view class="stat-box">
+        <view class="label">打卡次数</view>
+        <view class="value" style="color: {{habit.color}}">{{weekStats.count}}</view>
+      </view>
+      <view class="stat-box">
+        <view class="label">坚持天数</view>
+        <view class="value">{{weekStats.days}}</view>
+      </view>
+      <view class="stat-box">
+        <view class="label">周完成率</view>
+        <view class="value">{{weekStats.rate}}%</view>
+      </view>
+      <view class="stat-box">
+        <view class="label">小记数</view>
+        <view class="value">{{weekStats.notes}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="card-header">
+      <view class="card-title">{{currentYear}}年{{currentMonth}}月</view>
+    </view>
+    
+    <view class="calendar-weekdays">
+      <view wx:for="{{['一','二','三','四','五','六','日']}}" wx:key="*this" class="weekday">{{item}}</view>
+    </view>
+    
+    <view class="calendar-days">
+      <view wx:for="{{calendarEmptyDays}}" wx:key="index" class="day empty"></view>
+      <view wx:for="{{calendarDays}}" wx:key="day" class="day">
+        <view class="day-num {{item.isDone ? 'done' : ''}}" 
+              style="{{item.isDone ? 'background:'+habit.color+'; border-color:'+habit.color : ''}}">
+          {{item.day}}
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="card-header">
+      <view class="card-title">打卡记录</view>
+    </view>
+    
+    <view class="history-list">
+      <block wx:for="{{logsList}}" wx:key="index">
+        <view class="log-item">
+          <view class="log-left">
+            <view class="log-date">{{item.date}}</view>
+            <view class="log-time">{{item.time}}</view>
+          </view>
+          <view class="log-line"></view>
+          <view class="log-content">
+            <view class="log-note">{{item.note || '坚持打卡'}}</view>
+            <view class="log-tag" style="color: {{habit.color}}; border-color: {{habit.color}}30; background: {{habit.color}}10">Done</view>
+          </view>
+        </view>
+      </block>
+      
+      <view wx:if="{{logsList.length === 0}}" class="empty-logs">
+        暂无记录，快去打个卡吧！
+      </view>
+    </view>
+  </view>
+
+  <view class="delete-zone" bindtap="deleteHabit">删除此习惯</view>
+
+</view>
