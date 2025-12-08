@@ -1,25 +1,54 @@
 <view class="container">
-  <view class="header">
-    <view class="title">每日计划</view>
-    <view class="date">{{todayStr}}</view>
+  
+  <view class="calendar-header">
+    <view class="month-title">{{monthStr}}</view>
+    <view class="ctrl-btns">
+      <view class="btn" bindtap="prevMonth">‹</view>
+      <view class="btn" bindtap="nextMonth">›</view>
+      <view class="add-btn-mini" bindtap="goToAdd">+</view>
+    </view>
   </view>
 
-  <view class="task-list">
-    <block wx:for="{{habits}}" wx:key="id">
-      <view class="task-item">
-        <view class="task-left">
-          <view class="time-dot" style="background: {{item.color}};"></view>
-          <view class="task-info">
-            <view class="name">{{item.name}}</view>
-            <view class="sub">目标: {{item.goal}} 次</view>
+  <view class="calendar-wrapper">
+    <view class="week-row">
+      <view class="week-cell" wx:for="{{weekdays}}" wx:key="*this">{{item}}</view>
+    </view>
+    <view class="days-grid">
+      <block wx:for="{{calendarDays}}" wx:key="index">
+        <view class="day-cell {{item.fullDate === selectedDate ? 'selected' : ''}}" 
+              bindtap="selectDay" data-date="{{item.fullDate}}">
+          <text wx:if="{{!item.empty}}">{{item.day}}</text>
+          <view class="dots-row">
+            <view wx:for="{{item.dots}}" wx:key="*this" class="dot" style="background: {{item}};"></view>
           </view>
         </view>
-        <view class="status {{item.count >= item.goal ? 'done' : ''}}">
-          {{item.count >= item.goal ? '已完成' : '进行中'}}
-        </view>
-      </view>
-    </block>
-    
-    <view wx:if="{{habits.length === 0}}" class="empty">暂无计划，去首页添加吧</view>
+      </block>
+    </view>
   </view>
+
+  <scroll-view scroll-y class="timeline-container" scroll-top="400">
+    <view class="timeline-body">
+      <block wx:for="{{timeSlots}}" wx:key="*this">
+        <view class="time-row">
+          <text class="time-label">{{item}}</text>
+          <view class="time-line"></view>
+        </view>
+        <view class="time-row-half"><view class="time-line-dotted"></view></view>
+      </block>
+
+      <block wx:for="{{timelinePlans}}" wx:key="id">
+        <view class="plan-block" 
+              style="{{item.style}}" 
+              catchtap="showPlanAction" 
+              data-id="{{item.id}}">
+          <view class="block-content">
+            <view class="block-title">
+              <text style="margin-right:4px;" wx:if="{{item.icon}}">{{item.icon}}</text>{{item.title}}
+            </view>
+            <view class="block-time">{{item.startTime}} - {{item.endTime}}</view>
+          </view>
+        </view>
+      </block>
+    </view>
+  </scroll-view>
 </view>

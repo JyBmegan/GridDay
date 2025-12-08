@@ -9,7 +9,6 @@ Page({
     currentHabit: null,
     currentTime: '',
     note: '',
-    // ★★★ 下拉菜单状态 ★★★
     showDropdown: false
   },
 
@@ -17,23 +16,49 @@ Page({
     this.loadHabits();
   },
 
-  // 只需修改 loadHabits 函数，其他函数保持不变
+  // ★★★ 1. 新增：安全日期解析 (修复 iOS/模拟器 数据为0的问题) ★★★
+  safeDate(dateInput) {
+    if (!dateInput) return new Date();
+    if (typeof dateInput === 'number') return new Date(dateInput);
+    // 替换 - 为 /，解决 ISO 格式兼容性
+    return new Date(dateInput.toString().replace(/-/g, '/'));
+  },
+
   loadHabits() {
     const habits = wx.getStorageSync('habits') || [];
-    // ★★★ 修改：只读缓存，无缓存就是空数组 ★★★
     const categories = wx.getStorageSync('categories') || []; 
     const todayStr = this.getTodayStr();
 
     const processedHabits = habits.map(h => {
       if (!h.logs) h.logs = [];
+      
       const todayCount = h.logs.filter(log => {
          const t = typeof log === 'string' ? log : log.time;
          return t && t.startsWith(todayStr);
       }).length;
+
+      // ★★★ 2. 核心修复：计算 Hours 数据 (Curve 图表源数据) ★★★
+      const hoursData = new Array(24).fill(0);
+      h.logs.forEach(l => {
+          const t = typeof l === 'string' ? l : l.time;
+          if (t) {
+              // 使用 safeDate 解析时间，确保能读出 getHours
+              const d = this.safeDate(t);
+              const hour = d.getHours();
+              if (!isNaN(hour) && hour >= 0 && hour < 24) {
+                  hoursData[hour]++;
+              }
+          }
+      });
+
       return { 
         ...h, 
         count: todayCount,
-        heatmap: this.generateHeatmapData(h.logs, h.color)
+        heatmap: this.generateHeatmapData(h.logs, h.color),
+        
+        // ★★★ 3. 必须返回这两个字段，Stats 页面才能画图 ★★★
+        hoursData: hoursData, 
+        ec: { lazyLoad: true } 
       };
     });
 
@@ -41,38 +66,24 @@ Page({
     this.filterHabits();
   },
 
-  // ★★★ 切换下拉菜单 ★★★
-  toggleDropdown() {
-    this.setData({ showDropdown: !this.data.showDropdown });
-  },
-
-  // ★★★ 关闭下拉菜单 (点击空白处触发) ★★★
-  closeDropdown() {
-    if (this.data.showDropdown) {
-      this.setData({ showDropdown: false });
-    }
-  },
-
-  // ★★★ 切换分类并关闭菜单 ★★★
+  toggleDropdown() { this.setData({ showDropdown: !this.data.showDropdown }); },
+  closeDropdown() { if (this.data.showDropdown) this.setData({ showDropdown: false }); },
+  
   switchCategory(e) {
     const cat = e.currentTarget.dataset.cat;
-    this.setData({ 
-      currentCategory: cat,
-      showDropdown: false // 选完自动关
-    });
+    this.setData({ currentCategory: cat, showDropdown: false });
     this.filterHabits();
   },
 
   filterHabits() {
     const { allHabits, currentCategory } = this.data;
-    if (currentCategory === '全部') {
+    if (currentCategory === '全部' || currentCategory === 'All') {
       this.setData({ filteredHabits: allHabits });
     } else {
       this.setData({ filteredHabits: allHabits.filter(h => h.category === currentCategory) });
     }
   },
 
-  // ... 以下保持不变 ...
   checkIn(e) {
     const id = e.currentTarget.dataset.id;
     const habit = this.data.allHabits.find(h => h.id === id);
@@ -88,7 +99,8 @@ Page({
   confirmCheckIn() {
     const { currentHabit, note } = this.data;
     const now = new Date();
-    const fullTime = `${this.formatDate(now)}T${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}`;
+    // ISO 格式
+    const fullTime = `${now.getFullYear()}-${(now.getMonth()+1).toString().padStart(2,'0')}-${now.getDate().toString().padStart(2,'0')}T${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}`;
     
     const logRecord = { time: fullTime, note: note || '' };
     
@@ -107,7 +119,7 @@ Page({
 
   closeModal() { this.setData({ showModal: false }); },
   bindNoteInput(e) { this.setData({ note: e.detail.value }); },
-  stopProp() {}, // 阻止冒泡
+  stopProp() {}, 
 
   generateHeatmapData(logs, baseColor) {
     const weeksNeeded = 26; const daysPerWeek = 7; let heatmap = [];

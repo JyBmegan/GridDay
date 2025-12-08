@@ -1,104 +1,165 @@
 <view class="container" bindtap="closeDropdown">
   
-  <view class="header-row">
-    <view class="header-left">
-      <view class="title">数据中心</view>
-      <view class="subtitle">让坚持看得见</view>
+  <view class="type-switch-header">
+    <view class="type-btn {{statType === 'habit' ? 'active' : ''}}" bindtap="switchStatType" data-type="habit">Habits</view>
+    <view class="type-btn {{statType === 'plan' ? 'active' : ''}}" bindtap="switchStatType" data-type="plan">Plans</view>
+  </view>
+
+  <block wx:if="{{statType === 'habit'}}">
+    <view class="header-row">
+        <view class="header-left"><view class="title">Habit Data</view><view class="subtitle">Keep streak going</view></view>
+        <view class="filter-trigger" catchtap="toggleDropdown" wx:if="{{categories.length > 0}}"><text class="filter-text">{{currentCategory}}</text><view class="arrow-icon">▼</view></view>
     </view>
-    
-    <view class="filter-trigger" catchtap="toggleDropdown" wx:if="{{categories.length > 0}}">
-      <text class="filter-text">{{currentCategory}}</text>
-      <view class="arrow-icon {{showDropdown ? 'up' : ''}}">▼</view>
+    <view class="dropdown-menu {{showDropdown ? 'show' : ''}}" catchtap="stopProp">
+        <view class="dropdown-item" bindtap="switchCategory" data-cat="All">All</view>
+        <block wx:for="{{categories}}" wx:key="*this"><view class="dropdown-item" bindtap="switchCategory" data-cat="{{item}}">{{item}}</view></block>
     </view>
-  </view>
 
-  <view class="dropdown-menu {{showDropdown ? 'show' : ''}}" catchtap="stopProp">
-    <view class="dropdown-item {{currentCategory === '全部' ? 'active' : ''}}" bindtap="switchCategory" data-cat="全部">全部</view>
-    <block wx:for="{{categories}}" wx:key="*this">
-      <view class="dropdown-item {{currentCategory === item ? 'active' : ''}}" bindtap="switchCategory" data-cat="{{item}}">{{item}}</view>
-    </block>
-  </view>
-
-  <view class="mode-switch-container">
-    <view class="mode-switch-box">
-      <view class="mode-btn {{displayMode === 'trend' ? 'active' : ''}}" bindtap="switchDisplayMode" data-mode="trend">📅 趋势追踪</view>
-      <view class="mode-btn {{displayMode === 'time' ? 'active' : ''}}" bindtap="switchDisplayMode" data-mode="time">🕘 时段分布</view>
-    </view>
-  </view>
-
-  <view class="tabs-wrapper">
-    <view class="tabs-box">
-      <view class="tab {{currentView === 'week' ? 'active' : ''}}" bindtap="switchView" data-view="week">本周</view>
-      <view class="tab {{currentView === 'month' ? 'active' : ''}}" bindtap="switchView" data-view="month">本月</view>
-      <view class="tab {{currentView === 'year' ? 'active' : ''}}" bindtap="switchView" data-view="year">本年</view>
-    </view>
-  </view>
-
-  <view class="time-tip" wx:if="{{displayMode === 'time'}}">
-    <text>{{currentView === 'week' ? '本周' : (currentView === 'month' ? '本月' : '今年')}}活跃时段 · 平滑曲线</text>
-  </view>
-
-  <scroll-view scroll-y class="grid-scroll">
-    <view class="stats-grid">
-      <block wx:for="{{filteredHabits}}" wx:key="id" wx:for-item="habit">
-        <view class="stat-card" bindtap="goToDetail" data-id="{{habit.id}}">
-          
-          <view class="card-header">
-            <view class="icon-box" style="background: {{habit.color}}15;">{{habit.icon}}</view>
-            <view class="name-box">
-              <view class="name">{{habit.name}}</view>
-              <view class="count-text" style="color: {{habit.color}}" wx:if="{{displayMode === 'trend'}}">
-                {{currentView === 'week' ? habit.weekTotal : (currentView === 'month' ? habit.monthTotal : habit.yearTotal)}} 
-                <text class="unit-text">次</text>
-              </view>
-              <view class="category-tag" wx:else>{{habit.category || '默认'}}</view>
-            </view>
-          </view>
-
-          <view class="chart-area">
-            
-            <block wx:if="{{displayMode === 'trend'}}">
-              <view class="chart-week" wx:if="{{currentView === 'week'}}">
-                <block wx:for="{{habit.weekData}}" wx:key="date" wx:for-item="day">
-                  <view class="week-col">
-                    <view class="bar-track">
-                       <view class="bar-active" style="height: {{day.heightPct < 10 && day.count > 0 ? 10 : day.heightPct}}%; background: {{day.count > 0 ? habit.color : '#f0f2f5'}};"></view>
-                    </view>
-                    <text class="day-label">{{day.weekDay}}</text>
-                  </view>
-                </block>
-              </view>
-              <view class="chart-month" wx:if="{{currentView === 'month'}}">
-                 <block wx:for="{{habit.monthData}}" wx:key="date" wx:for-item="day">
-                    <view class="month-pixel" style="background: {{day.count > 0 ? habit.color : '#f0f2f5'}}; opacity: {{day.count > 0 ? day.opacity : 1}};"></view>
-                 </block>
-              </view>
-              <view class="chart-year" wx:if="{{currentView === 'year'}}">
-                 <block wx:for="{{habit.yearData}}" wx:key="month" wx:for-item="monthBlock">
-                    <view class="year-block" style="background: {{monthBlock.count > 0 ? habit.color : '#f5f6fa'}}; opacity: {{monthBlock.count > 0 ? monthBlock.opacity : 1}};">
-                      <text class="year-month-num" style="color: {{monthBlock.count > 0 ? '#fff' : '#ccc'}}">{{index + 1}}</text>
-                    </view>
-                 </block>
-              </view>
-            </block>
-
-            <block wx:if="{{displayMode === 'time'}}">
-               <view class="chart-time-curve">
-                  <ec-canvas id="chart-time-{{habit.id}}" canvas-id="chart-time-{{habit.id}}" ec="{{ habit.ec }}"></ec-canvas>
-               </view>
-            </block>
-
-          </view>
+    <view class="mode-switch-container">
+        <view class="mode-switch-box">
+          <view class="mode-btn {{displayMode === 'trend' ? 'active' : ''}}" bindtap="switchDisplayMode" data-mode="trend">Trend</view>
+          <view class="mode-btn {{displayMode === 'time' ? 'active' : ''}}" bindtap="switchDisplayMode" data-mode="time">Hours</view>
         </view>
-      </block>
     </view>
-    
-    <view class="empty-state" wx:if="{{filteredHabits.length === 0}}">
-      <view class="empty-text">
-        {{currentCategory === '全部' ? '暂无数据' : '“' + currentCategory + '”下暂无习惯'}}
-      </view>
+
+    <view class="tabs-wrapper" wx:if="{{displayMode === 'trend'}}">
+        <view class="tabs-box">
+          <view class="tab {{currentView === 'week' ? 'active' : ''}}" bindtap="switchView" data-view="week">Week</view>
+          <view class="tab {{currentView === 'month' ? 'active' : ''}}" bindtap="switchView" data-view="month">Month</view>
+          <view class="tab {{currentView === 'year' ? 'active' : ''}}" bindtap="switchView" data-view="year">Year</view>
+        </view>
     </view>
-    
-    <view style="height: 40px;"></view>
-  </scroll-view>
+
+    <scroll-view scroll-y class="grid-scroll">
+        <view class="stats-grid">
+          <block wx:for="{{filteredHabits}}" wx:key="id" wx:for-item="habit">
+            <view class="stat-card" bindtap="goToDetail" data-id="{{habit.id}}">
+                <view class="card-header">
+                    <view class="icon-box" style="background: {{habit.color}}15;">{{habit.icon}}</view>
+                    <view class="name-box">
+                        <view class="name">{{habit.name}}</view>
+                        <view class="count-text" style="color: {{habit.color}}">
+                            {{displayMode==='trend' ? (currentView==='week'?habit.weekTotal:habit.monthTotal) : 'Curve'}} 
+                            <text class="unit-text">hits</text>
+                        </view>
+                    </view>
+                </view>
+                <view class="chart-area">
+                    <block wx:if="{{displayMode === 'trend'}}">
+                        <view class="chart-week" wx:if="{{currentView === 'week'}}"><block wx:for="{{habit.weekData}}" wx:key="date" wx:for-item="day"><view class="week-col"><view class="bar-track"><view class="bar-active" style="height: {{day.heightPct}}%; background: {{day.count>0?habit.color:'#e0e0e0'}}"></view></view><text class="day-label">{{day.weekDay}}</text></view></block></view>
+                        <view class="chart-month" wx:if="{{currentView === 'month'}}"><block wx:for="{{habit.monthData}}" wx:key="date" wx:for-item="day"><view class="month-pixel" style="background: {{day.count>0?habit.color:'#e0e0e0'}}; opacity: {{day.opacity}}"></view></block></view>
+                        <view class="chart-year" wx:if="{{currentView === 'year'}}"><block wx:for="{{habit.yearData}}" wx:key="month" wx:for-item="m"><view class="year-block" style="background: {{m.count>0?habit.color:'#e0e0e0'}}; opacity: {{m.opacity}}"><text class="year-month-num" style="color:{{m.count>0?'#fff':'#ccc'}}">{{index+1}}</text></view></block></view>
+                    </block>
+                    <block wx:if="{{displayMode === 'time'}}">
+                        <view class="chart-time-curve">
+                            <ec-canvas 
+                                id="chart-time-{{habit.id}}" 
+                                canvas-id="chart-time-{{habit.id}}" 
+                                ec="{{ habit.ec }}" 
+                                force-use-old-canvas="false">
+                            </ec-canvas>
+                        </view>
+                    </block>
+                </view>
+            </view>
+          </block>
+        </view>
+        <view style="height: 40px;"></view>
+    </scroll-view>
+  </block>
+
+  <block wx:if="{{statType === 'plan'}}">
+    <view class="header-row">
+       <view class="range-nav-bar compact">
+          <view class="nav-btn" bindtap="prevRange">‹</view>
+          <view class="nav-text">{{dateRangeStr}}</view>
+          <view class="nav-btn" bindtap="nextRange">›</view>
+       </view>
+       <view class="filter-trigger" catchtap="togglePlanDropdown">
+           <text class="filter-text">{{currentPlanCategory}}</text>
+           <view class="arrow-icon">▼</view>
+       </view>
+    </view>
+    <view class="dropdown-menu {{showPlanDropdown ? 'show' : ''}}" catchtap="stopProp">
+        <view class="dropdown-item" bindtap="switchPlanCategory" data-cat="All">All</view>
+        <block wx:for="{{planCategories}}" wx:key="*this">
+           <view class="dropdown-item" bindtap="switchPlanCategory" data-cat="{{item.name}}">{{item.name}}</view>
+        </block>
+    </view>
+
+    <view class="tabs-wrapper">
+        <view class="tabs-box">
+          <view class="tab {{currentView === 'week' ? 'active' : ''}}" bindtap="switchView" data-view="week">Week</view>
+          <view class="tab {{currentView === 'month' ? 'active' : ''}}" bindtap="switchView" data-view="month">Month</view>
+          <view class="tab {{currentView === 'year' ? 'active' : ''}}" bindtap="switchView" data-view="year">Year</view>
+        </view>
+    </view>
+
+    <scroll-view scroll-y class="grid-scroll">
+       <view class="stat-card">
+          <view class="card-header"><view class="name-box"><view class="name">Intensity Map</view></view></view>
+          <scroll-view scroll-x class="year-scroll-box" wx:if="{{isYearView}}">
+             <view class="heatmap-grid-year-gh">
+                <block wx:for="{{heatmapGrid}}" wx:key="index">
+                   <view class="viz-block" style="background: {{item.color}}; opacity: {{item.opacity}}"></view>
+                </block>
+             </view>
+          </scroll-view>
+          <view class="heatmap-grid-normal" wx:else>
+             <block wx:for="{{heatmapGrid}}" wx:key="index">
+                <view class="viz-block {{item.empty?'empty':''}}" style="background: {{item.color}}; opacity: {{item.opacity}}"></view>
+             </block>
+          </view>
+          <view class="data-footer">
+             <view class="data-item"><text class="d-label">{{footerData.heatmap.label1}}</text><text class="d-val">{{footerData.heatmap.val1}}</text></view>
+             <view class="data-item"><text class="d-label">{{footerData.heatmap.label2}}</text><text class="d-val">{{footerData.heatmap.val2}}</text></view>
+          </view>
+       </view>
+
+       <view class="stat-card">
+          <view class="card-header"><view class="name-box"><view class="name">Trends</view></view></view>
+          <view class="chart-container" style="height: {{trendHeight}}px;">
+             <ec-canvas id="chart-plan-bar" canvas-id="chart-plan-bar" ec="{{ ecStackBar }}" force-use-old-canvas="false"></ec-canvas>
+          </view>
+          <view class="data-footer">
+             <view class="data-item"><text class="d-label">{{footerData.trend.label1}}</text><text class="d-val">{{footerData.trend.val1}}</text></view>
+             <view class="data-item"><text class="d-label">{{footerData.trend.label2}}</text><text class="d-val">{{footerData.trend.val2}}</text></view>
+          </view>
+       </view>
+
+       <view class="stat-card" style="height: auto;">
+          <view class="card-header"><view class="name-box"><view class="name">Distribution</view></view></view>
+          <view class="dist-layout-col">
+             <view class="chart-container" style="height: 200px; width: 100%;">
+                <ec-canvas id="chart-plan-pie" canvas-id="chart-plan-pie" ec="{{ ecPie }}" force-use-old-canvas="false"></ec-canvas>
+             </view>
+             <view class="legend-list">
+                <block wx:for="{{planCategories}}" wx:key="name">
+                   <view class="legend-item">
+                      <view class="legend-left"><view class="legend-dot" style="background: {{item.color}}"></view><text class="legend-name">{{item.name}}</text></view>
+                      <view class="legend-right"><text class="legend-hours">{{item.hours}}h</text><text class="legend-percent">{{item.percent}}%</text></view>
+                   </view>
+                </block>
+             </view>
+          </view>
+          <view class="data-footer">
+             <view class="data-item"><text class="d-label">{{footerData.dist.label1}}</text><text class="d-val">{{footerData.dist.val1}}</text></view>
+             <view class="data-item"><text class="d-label">{{footerData.dist.label2}}</text><text class="d-val">{{footerData.dist.val2}}</text></view>
+          </view>
+       </view>
+
+       <view class="stat-card">
+          <view class="card-header"><view class="name-box"><view class="name">Hourly Focus</view></view></view>
+          <view class="chart-container" style="height: 150px;">
+             <ec-canvas id="chart-plan-curve" canvas-id="chart-plan-curve" ec="{{ ecLine }}" force-use-old-canvas="false"></ec-canvas>
+          </view>
+          <view class="data-footer">
+             <view class="data-item"><text class="d-label">{{footerData.curve.label1}}</text><text class="d-val">{{footerData.curve.val1}}</text></view>
+             <view class="data-item"><text class="d-label">{{footerData.curve.label2}}</text><text class="d-val">{{footerData.curve.val2}}</text></view>
+          </view>
+       </view>
+
+       <view style="height: 40px;"></view>
+    </scroll-view>
+  </block>
 </view>

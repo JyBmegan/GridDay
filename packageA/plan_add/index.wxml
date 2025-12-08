@@ -1,0 +1,80 @@
+<view class="container">
+  <view class="page-title">New Plan</view>
+
+  <view class="input-group">
+    <input class="main-input" placeholder="What needs to be done?" placeholder-class="ph" bindinput="bindTitle" auto-focus />
+  </view>
+
+  <view class="section-title">Category</view>
+  <view class="category-wrapper">
+    <view class="category-list">
+      <view wx:for="{{categories}}" wx:key="*this"
+        class="cat-tag {{category === item ? 'active' : ''}}" 
+        bindtap="selectCategory" data-cat="{{item}}"
+        style="{{category === item ? 'background:'+selectedColor+'; border-color:'+selectedColor : ''}}">
+        {{item}}
+      </view>
+      <view class="cat-tag add-btn" bindtap="toggleAddCategory" wx:if="{{!showAddCategory}}">+</view>
+    </view>
+    <view class="add-cat-box" wx:if="{{showAddCategory}}">
+      <input class="cat-input" placeholder="New Category" focus="{{true}}" bindinput="bindCategoryInput" />
+      <view class="cat-confirm" bindtap="confirmAddCategory" style="color: {{selectedColor}}">OK</view>
+    </view>
+  </view>
+
+  <view class="section-title">Icon</view>
+  <view class="emoji-grid">
+    <view wx:for="{{emojis}}" wx:key="*this" bindtap="selectEmoji" data-emoji="{{item}}" 
+          class="emoji-item {{icon === item ? 'selected' : ''}}" 
+          style="border-color: {{icon === item ? selectedColor : 'transparent'}}; background: {{icon === item ? selectedColor + '20' : '#fff'}};">
+      {{item}}
+    </view>
+  </view>
+
+  <view class="time-card">
+    <picker mode="date" value="{{date}}" bindchange="bindDateChange">
+      <view class="picker-row">
+        <text class="label">Date</text>
+        <text class="value">{{date}}</text>
+      </view>
+    </picker>
+    <view class="divider"></view>
+    <picker mode="time" value="{{startTime}}" bindchange="bindStartTimeChange">
+      <view class="picker-row">
+        <text class="label">Start</text>
+        <text class="value">{{startTime}}</text>
+      </view>
+    </picker>
+    <view class="divider"></view>
+    <picker mode="time" value="{{endTime}}" bindchange="bindEndTimeChange">
+      <view class="picker-row">
+        <text class="label">End</text>
+        <text class="value">{{endTime}}</text>
+      </view>
+    </picker>
+  </view>
+
+  <view class="color-trigger" bindtap="toggleColorPicker">
+    <text>Color Tag</text>
+    <view class="color-dot" style="background: {{selectedColor}};"></view>
+  </view>
+
+  <view class="footer">
+    <button class="save-btn" bindtap="savePlan" style="background: {{selectedColor}}; box-shadow: 0 4px 15px {{selectedColor}}60;">
+      Save Schedule
+    </button>
+  </view>
+
+  <view class="color-modal {{showColorPicker ? 'show' : ''}}">
+    <view class="modal-content">
+      <view class="modal-title">Select Color</view>
+      <view class="color-grid">
+        <view wx:for="{{colors}}" wx:key="*this" bindtap="selectColor" data-color="{{item}}"
+              class="color-circle" style="background: {{item}};">
+          <view wx:if="{{selectedColor === item}}" class="check">✓</view>      
+        </view>
+      </view>
+    </view>
+    <view class="modal-mask" bindtap="toggleColorPicker"></view>
+  </view>
+</view>

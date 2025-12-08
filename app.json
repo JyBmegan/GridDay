@@ -9,7 +9,8 @@
       "root": "packageA",
       "pages": [
         "add/index",
-        "detail/index"
+        "detail/index",
+        "plan_add/index"
       ]
     }
   ],
