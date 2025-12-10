@@ -10,10 +10,12 @@
         <view class="header-left"><view class="title">Habit Data</view><view class="subtitle">Keep streak going</view></view>
         <view class="filter-trigger" catchtap="toggleDropdown" wx:if="{{categories.length > 0}}"><text class="filter-text">{{currentCategory}}</text><view class="arrow-icon">▼</view></view>
     </view>
-    <view class="dropdown-menu {{showDropdown ? 'show' : ''}}" catchtap="stopProp">
-        <view class="dropdown-item" bindtap="switchCategory" data-cat="All">All</view>
-        <block wx:for="{{categories}}" wx:key="*this"><view class="dropdown-item" bindtap="switchCategory" data-cat="{{item}}">{{item}}</view></block>
-    </view>
+<view class="dropdown-menu {{showPlanDropdown ? 'show' : ''}}" catchtap="stopProp">
+    <view class="dropdown-item" bindtap="switchPlanCategory" data-cat="All">All</view>
+    <block wx:for="{{planFilterCats}}" wx:key="*this">
+        <view class="dropdown-item" bindtap="switchPlanCategory" data-cat="{{item}}">{{item}}</view>
+    </block>
+</view>
 
     <view class="mode-switch-container">
         <view class="mode-switch-box">
@@ -39,7 +41,7 @@
                     <view class="name-box">
                         <view class="name">{{habit.name}}</view>
                         <view class="count-text" style="color: {{habit.color}}">
-                            {{displayMode==='trend' ? (currentView==='week'?habit.weekTotal:habit.monthTotal) : 'Curve'}} 
+                            {{displayMode==='trend' ? (currentView==='week'?habit.weekTotal:habit.monthTotal) : habit.totalCount}} 
                             <text class="unit-text">hits</text>
                         </view>
                     </view>
@@ -47,17 +49,25 @@
                 <view class="chart-area">
                     <block wx:if="{{displayMode === 'trend'}}">
                         <view class="chart-week" wx:if="{{currentView === 'week'}}"><block wx:for="{{habit.weekData}}" wx:key="date" wx:for-item="day"><view class="week-col"><view class="bar-track"><view class="bar-active" style="height: {{day.heightPct}}%; background: {{day.count>0?habit.color:'#e0e0e0'}}"></view></view><text class="day-label">{{day.weekDay}}</text></view></block></view>
-                        <view class="chart-month" wx:if="{{currentView === 'month'}}"><block wx:for="{{habit.monthData}}" wx:key="date" wx:for-item="day"><view class="month-pixel" style="background: {{day.count>0?habit.color:'#e0e0e0'}}; opacity: {{day.opacity}}"></view></block></view>
-                        <view class="chart-year" wx:if="{{currentView === 'year'}}"><block wx:for="{{habit.yearData}}" wx:key="month" wx:for-item="m"><view class="year-block" style="background: {{m.count>0?habit.color:'#e0e0e0'}}; opacity: {{m.opacity}}"><text class="year-month-num" style="color:{{m.count>0?'#fff':'#ccc'}}">{{index+1}}</text></view></block></view>
+                        
+                        <view class="chart-month" wx:if="{{currentView === 'month'}}">
+                            <block wx:for="{{habit.monthData}}" wx:key="date" wx:for-item="day">
+                                <view class="month-pixel" style="background: {{day.isEmpty ? '#ebedf0' : habit.color}}; opacity: {{day.opacity}}"></view>
+                            </block>
+                        </view>
+                        
+                        <view class="chart-year" wx:if="{{currentView === 'year'}}">
+                            <block wx:for="{{habit.yearData}}" wx:key="month" wx:for-item="m">
+                                <view class="year-block" style="background: {{m.isEmpty ? '#ebedf0' : habit.color}}; opacity: {{m.opacity}}">
+                                    <text class="year-month-num" style="color:{{m.isEmpty ? '#ccc' : '#fff'}}">{{index+1}}</text>
+                                </view>
+                            </block>
+                        </view>
                     </block>
+                    
                     <block wx:if="{{displayMode === 'time'}}">
                         <view class="chart-time-curve">
-                            <ec-canvas 
-                                id="chart-time-{{habit.id}}" 
-                                canvas-id="chart-time-{{habit.id}}" 
-                                ec="{{ habit.ec }}" 
-                                force-use-old-canvas="false">
-                            </ec-canvas>
+                            <ec-canvas id="chart-time-{{habit.id}}" canvas-id="chart-time-{{habit.id}}" ec="{{ habit.ec }}" force-use-old-canvas="false"></ec-canvas>
                         </view>
                     </block>
                 </view>
@@ -80,10 +90,11 @@
            <view class="arrow-icon">▼</view>
        </view>
     </view>
-    <view class="dropdown-menu {{showPlanDropdown ? 'show' : ''}}" catchtap="stopProp">
+  <view class="dropdown-menu {{showPlanDropdown ? 'show' : ''}}" catchtap="stopProp">
         <view class="dropdown-item" bindtap="switchPlanCategory" data-cat="All">All</view>
-        <block wx:for="{{planCategories}}" wx:key="*this">
-           <view class="dropdown-item" bindtap="switchPlanCategory" data-cat="{{item.name}}">{{item.name}}</view>
+        
+        <block wx:for="{{planFilterCats}}" wx:key="*this">
+           <view class="dropdown-item" bindtap="switchPlanCategory" data-cat="{{item}}">{{item}}</view>
         </block>
     </view>
 
@@ -98,19 +109,29 @@
     <scroll-view scroll-y class="grid-scroll">
        <view class="stat-card">
           <view class="card-header"><view class="name-box"><view class="name">Intensity Map</view></view></view>
-          <scroll-view scroll-x class="year-scroll-box" wx:if="{{isYearView}}">
+          
+          <scroll-view scroll-x class="year-scroll-box" wx:if="{{isYearView}}" enable-flex="true">
              <view class="heatmap-grid-year-gh">
                 <block wx:for="{{heatmapGrid}}" wx:key="index">
-                   <view class="viz-block" style="background: {{item.color}}; opacity: {{item.opacity}}"></view>
+                   <view class="viz-block-year" style="background: {{item.color}}; opacity: {{item.opacity}}"></view>
                 </block>
              </view>
           </scroll-view>
-          <view class="heatmap-grid-normal" wx:else>
-             <block wx:for="{{heatmapGrid}}" wx:key="index">
-                <view class="viz-block {{item.empty?'empty':''}}" style="background: {{item.color}}; opacity: {{item.opacity}}"></view>
-             </block>
+
+          <view class="intensity-row" wx:else>
+             <view class="intensity-chart">
+                <view class="heatmap-grid-normal">
+                   <block wx:for="{{heatmapGrid}}" wx:key="index">
+                      <view class="viz-block {{item.empty?'empty':''}}" style="background: {{item.color}}; opacity: {{item.opacity}}"></view>
+                   </block>
+                </view>
+             </view>
+             <view class="intensity-data">
+                <view class="data-item-sm"><text class="d-label-sm">{{footerData.heatmap.label1}}</text><text class="d-val-sm">{{footerData.heatmap.val1}}</text></view>
+                <view class="data-item-sm" style="margin-top:15px"><text class="d-label-sm">{{footerData.heatmap.label2}}</text><text class="d-val-sm">{{footerData.heatmap.val2}}</text></view>
+             </view>
           </view>
-          <view class="data-footer">
+          <view class="data-footer" wx:if="{{isYearView}}">
              <view class="data-item"><text class="d-label">{{footerData.heatmap.label1}}</text><text class="d-val">{{footerData.heatmap.val1}}</text></view>
              <view class="data-item"><text class="d-label">{{footerData.heatmap.label2}}</text><text class="d-val">{{footerData.heatmap.val2}}</text></view>
           </view>
@@ -158,7 +179,6 @@
              <view class="data-item"><text class="d-label">{{footerData.curve.label2}}</text><text class="d-val">{{footerData.curve.val2}}</text></view>
           </view>
        </view>
-
        <view style="height: 40px;"></view>
     </scroll-view>
   </block>
