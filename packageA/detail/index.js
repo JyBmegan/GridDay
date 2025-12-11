@@ -3,7 +3,7 @@ import * as echarts from '../../ec-canvas/echarts';
 Page({
   data: {
     habit: {},
-    ec: { lazyLoad: true }, // 延迟加载图表
+    ec: { lazyLoad: true }, 
     
     // 周视图数据
     currentWeekNum: 0,
@@ -27,40 +27,33 @@ Page({
     }
   },
 
-  // 加载数据核心函数
   loadHabit() {
     const habits = wx.getStorageSync('habits') || [];
     const habit = habits.find(h => h.id === this.habitId);
     
     if (!habit) {
-      wx.showToast({ title: '习惯不存在', icon: 'none' });
+      wx.showToast({ title: 'Habit not found', icon: 'none' });
       setTimeout(() => wx.navigateBack(), 1500);
       return;
     }
 
-    // 默认颜色防错
     if (!habit.color) habit.color = '#FF9F43';
 
     this.setData({ habit });
     
-    // 1. 处理历史记录列表
     this.processLogs(habit.logs || []);
-    
-    // 2. 初始化周视图数据
+  
     this.updateWeekView();
     
-    // 3. 初始化月视图日历
     this.updateMonthView();
     
-    // 4. 初始化图表组件
     this.chartComp = this.selectComponent('#mychart-week');
     this.initChart();
   },
 
-  // --- 1. 处理历史记录 (倒序) ---
+  // 处理历史记录 (倒序)
   processLogs(logs) {
     const list = logs.map(log => {
-      // 兼容旧数据(纯字符串)和新数据(对象)
       const timeStr = typeof log === 'string' ? log : log.time;
       const note = typeof log === 'string' ? '' : log.note;
       
@@ -68,14 +61,13 @@ Page({
       
       const d = new Date(timeStr);
       return {
-        ts: d.getTime(), // 用于排序
+        ts: d.getTime(), 
         date: `${(d.getMonth()+1).toString().padStart(2,'0')}-${d.getDate().toString().padStart(2,'0')}`,
         time: `${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`,
         note: note
       };
     }).filter(item => item !== null);
 
-    // 按时间倒序，最新的在上面
     list.sort((a, b) => b.ts - a.ts);
 
     this.setData({ 
@@ -83,7 +75,7 @@ Page({
     }); 
   },
 
-  // --- 2. 周视图数据逻辑 ---
+  // 周视图
   updateWeekView() {
     const today = new Date();
     // 获取本周一 (如果今天是周日0，则回退6天)
@@ -92,7 +84,7 @@ Page({
     monday.setHours(0,0,0,0);
     monday.setDate(monday.getDate() - dayOfWeek + 1);
 
-    const xLabels = ['一','二','三','四','五','六','日'];
+    const xLabels = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
     const dataCounts = [];
     let doneDays = 0;
     let totalCount = 0;
@@ -129,7 +121,7 @@ Page({
     }
   },
 
-  // --- 3. 月视图日历逻辑 ---
+  // 月视图
   updateMonthView() {
       const d = this.data.currentMonthDate || new Date();
       const year = d.getFullYear();
@@ -176,13 +168,12 @@ Page({
       });
   },
 
-  // --- 4. ECharts 图表初始化 ---
+  //ECharts 图表初始化
   initChart() {
     this.chartComp.init((canvas, width, height, dpr) => {
       const chart = echarts.init(canvas, null, { width, height, devicePixelRatio: dpr });
       this.chartInstance = chart;
       
-      // 稍微延迟，确保数据已准备好
       setTimeout(() => {
          this.updateWeekView(); 
       }, 200);
@@ -198,14 +189,14 @@ Page({
         tooltip: { 
             trigger: 'axis', 
             confine: true,
-            formatter: '{b}: {c}次'
+            formatter: '{b}: {c} Hits'
         },
         xAxis: { 
             type: 'category', 
             data: xLabels, 
             axisLine: {show: false}, 
             axisTick: {show: false},
-            axisLabel: { color: '#999', fontSize: 11, margin: 10 }
+            axisLabel: { color: '#5d5d5d', fontSize: 12, margin: 10 }
         },
         yAxis: { 
             show: false, 
@@ -221,13 +212,13 @@ Page({
             },
             showBackground: true,
             backgroundStyle: { color: '#f5f6fa', borderRadius: 6 },
-            label: { 
-                show: true, 
-                position: 'top', 
-                color: color, 
-                fontSize: 12,
-                formatter: p => p.value > 0 ? p.value : '' 
-            }
+            // label: { 
+            //     show: true, 
+            //     position: 'top', 
+            //     color: color, 
+            //     fontSize: 12,
+            //     formatter: p => p.value > 0 ? p.value : '' 
+            // }
         }]
     };
     chart.setOption(option);
@@ -241,8 +232,8 @@ Page({
   // 删除习惯
   deleteHabit() {
      wx.showModal({
-      title: '⚠️ 确认删除',
-      content: `确定要删除“${this.data.habit.name}”吗？此操作无法撤销。`,
+      title: '⚠️ Delete Habit?',
+      content: `Permanently delete"${this.data.habit.name}"? This action cannot be undone.`,
       confirmColor: '#ff6b6b',
       success: (res) => {
         if (res.confirm) {

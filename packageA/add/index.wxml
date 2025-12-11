@@ -1,13 +1,13 @@
 <view class="container">
-  <view class="page-title">新建习惯</view>
+  <view class="page-title">New Habit</view>
 
   <view class="section">
-    <view class="label">习惯名称</view>
-    <input class="input-box" placeholder="例如：背单词" placeholder-class="ph-style" bindinput="bindNameInput" />
+    <view class="label">Habit Name</view>
+    <input class="input-box" placeholder="e.g., Drink water" placeholder-class="ph-style" bindinput="bindNameInput" />
   </view>
 
   <view class="section">
-    <view class="label">所属分类</view>
+    <view class="label">Category</view>
     <view class="category-list">
       <view 
         wx:for="{{categoryList}}" wx:key="*this"
@@ -21,13 +21,13 @@
     </view>
     
     <view class="add-cat-box" wx:if="{{showAddCategory}}">
-      <input class="cat-input" placeholder="输入新分类" focus="{{true}}" bindinput="bindCategoryInput" />
-      <view class="cat-confirm" bindtap="confirmAddCategory" style="color: {{selectedColor}}">确定</view>
+      <input class="cat-input" placeholder="New Category Name" focus="{{true}}" bindinput="bindCategoryInput" />
+      <view class="cat-confirm" bindtap="confirmAddCategory" style="color: {{selectedColor}}">Saved</view>
     </view>
   </view>
 
   <view class="section">
-    <view class="label">选择图标 <text wx:if="{{icon}}" style="font-size:18px; margin-left:10px;">当前: {{icon}}</text></view>
+    <view class="label">Icon <text wx:if="{{icon}}" style="font-size:16px; margin-left:10px;">  - Selected: {{icon}}</text></view>
     <view class="emoji-grid">
       <view 
         wx:for="{{emojis}}" 
@@ -43,7 +43,7 @@
   </view>
 
   <view class="section">
-    <view class="label">主题颜色</view>
+    <view class="label">Color</view>
     <view class="color-scroll">
       <view 
         wx:for="{{colors}}" 
@@ -58,16 +58,16 @@
   </view>
 
   <view class="section">
-    <view class="label">每日打卡目标</view>
+    <view class="label">Daily Goal</view>
     <view class="stepper-box">
       <view class="stepper-btn" bindtap="decreaseGoal">-</view>
       <view class="stepper-num" style="color: {{selectedColor}}">{{goal}}</view>
       <view class="stepper-btn" bindtap="increaseGoal">+</view>
-      <text class="unit">次/天</text>
+      <text class="unit">times daily</text>
     </view>
   </view>
 
   <button class="save-btn" bindtap="saveHabit" style="background: {{selectedColor}}; box-shadow: 0 8px 20px {{selectedColor}}60;">
-    开始坚持
+    Start Tracking
   </button>
 </view>

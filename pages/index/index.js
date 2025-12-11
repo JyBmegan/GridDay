@@ -3,8 +3,7 @@ Page({
     allHabits: [],
     filteredHabits: [],
     categories: [],
-    currentCategory: '全部',
-    // 弹窗数据
+    currentCategory: 'All',
     showModal: false,
     currentHabit: null,
     currentTime: '',
@@ -16,7 +15,6 @@ Page({
     this.loadHabits();
   },
 
-  // ★★★ 1. 新增：安全日期解析 (修复 iOS/模拟器 数据为0的问题) ★★★
   safeDate(dateInput) {
     if (!dateInput) return new Date();
     if (typeof dateInput === 'number') return new Date(dateInput);
@@ -37,12 +35,10 @@ Page({
          return t && t.startsWith(todayStr);
       }).length;
 
-      // ★★★ 2. 核心修复：计算 Hours 数据 (Curve 图表源数据) ★★★
       const hoursData = new Array(24).fill(0);
       h.logs.forEach(l => {
           const t = typeof l === 'string' ? l : l.time;
           if (t) {
-              // 使用 safeDate 解析时间，确保能读出 getHours
               const d = this.safeDate(t);
               const hour = d.getHours();
               if (!isNaN(hour) && hour >= 0 && hour < 24) {
@@ -55,8 +51,7 @@ Page({
         ...h, 
         count: todayCount,
         heatmap: this.generateHeatmapData(h.logs, h.color),
-        
-        // ★★★ 3. 必须返回这两个字段，Stats 页面才能画图 ★★★
+
         hoursData: hoursData, 
         ec: { lazyLoad: true } 
       };
@@ -77,7 +72,7 @@ Page({
 
   filterHabits() {
     const { allHabits, currentCategory } = this.data;
-    if (currentCategory === '全部' || currentCategory === 'All') {
+    if (currentCategory === 'All' || currentCategory === 'All') {
       this.setData({ filteredHabits: allHabits });
     } else {
       this.setData({ filteredHabits: allHabits.filter(h => h.category === currentCategory) });
@@ -114,7 +109,7 @@ Page({
 
     this.setData({ showModal: false });
     this.loadHabits();
-    wx.showToast({ title: '记录已保存', icon: 'success' });
+    wx.showToast({ title: 'Recorded!', icon: 'success' });
   },
 
   closeModal() { this.setData({ showModal: false }); },
