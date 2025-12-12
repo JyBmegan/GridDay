@@ -42,12 +42,19 @@
 
 /* Color*/
 .color-scroll { 
-  display: flex; 
-  flex-wrap: wrap; 
+  display: grid; 
+  grid-template-columns: repeat(9, 1fr);
   gap: 12px; 
+  max-height: 220px;    
+  overflow-y: auto;      
+  padding: 5px;     
+  align-content: start;  
 }
 .color-item { 
-  width: 36px; height: 36px; border-radius: 50%; position: relative; 
+  width: 100%; 
+  aspect-ratio: 1/1;
+  border-radius: 50%;
+  position: relative; 
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 .check-mark { 
