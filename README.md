@@ -26,6 +26,7 @@
 
 ## Directory Structure
 
+```text
 GridDay/
 ├── app.js              # Global logic (Launch, Local Storage init)
 ├── app.json            # Global config (Subpackages, TabBar)
@@ -40,3 +41,4 @@ GridDay/
 │   │   └── add/        # Add/Edit Page
 ├── ec-canvas/          # ECharts Component Library
 └── assets/             # Static Assets (Logo, Icons, Screenshots)
+```
