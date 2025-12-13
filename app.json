@@ -14,10 +14,11 @@
       ]
     }
   ],
+
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#FAFBFC",
-    "navigationBarTitleText": "Habit Tracker",
+    "navigationBarTitleText": "GridDay",
     "navigationBarTextStyle": "black"
   },
   "tabBar": {
