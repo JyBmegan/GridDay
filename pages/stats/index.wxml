@@ -42,7 +42,7 @@
                         <view class="name">{{habit.name}}</view>
                         <view class="count-text" style="color: '#5d5d5d'">
                             {{displayMode==='trend' ? (currentView==='week'?habit.weekTotal:habit.monthTotal) : habit.totalCount}} 
-                            <text class="unit-text">hits</text>
+                            <text class="unit-text">times</text>
                         </view>
                     </view>
                 </view>

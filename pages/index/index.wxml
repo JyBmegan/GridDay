@@ -48,7 +48,7 @@
         </view>
         <view class="card-footer-text">
            <text style="color: #999; font-size: 11px;">{{habit.category || 'General'}}</text>
-           <text style="color: {{habit.color}}; font-weight: bold; margin-left: 5px;">Today: {{habit.count}} Hits</text>
+           <text style="color: {{habit.color}}; font-weight: bold; margin-left: 5px;">Today: {{habit.count}} Times</text>
         </view>
       </view>
     </block>

@@ -173,7 +173,7 @@ Page({
 
     // 第二层筛选：分类，finalPlans 是最终用于画图和计算统计的数据
     let finalPlans = dateFilteredPlans;
-    let targetColor = '#54a0ff'; 
+    let targetColor = '#212121'; 
     
     if (this.data.currentPlanCategory !== 'All') {
         finalPlans = dateFilteredPlans.filter(p => p.category === this.data.currentPlanCategory);
@@ -295,7 +295,7 @@ Page({
         planSummary: { totalHours: total.toFixed(1), count: finalPlans.length, activeDays: activeDaysSet.size, topCat },
         footerData: {
             heatmap: { label1: 'Active Days', val1: activeDaysSet.size, label2: 'Total Hours', val2: total.toFixed(1) },
-            trend:   { label1: 'Daily Avg', val1: avgDur+'h', label2: 'Top Cat', val2: topCat },
+            trend:   { label1: 'Daily Average', val1: avgDur+'h', label2: 'Top Category', val2: topCat },
             dist:    { label1: 'Categories', val1: pieData.length, label2: 'Coverage', val2: '100%' },
             curve:   { label1: 'Peak Hour', val1: maxHourVal>0?`${peakHour}:00`:'-', label2: 'Intensity', val2: maxHourVal }
         }

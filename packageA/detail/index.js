@@ -189,7 +189,7 @@ Page({
         tooltip: { 
             trigger: 'axis', 
             confine: true,
-            formatter: '{b}: {c} Hits'
+            formatter: '{b}: {c} Times'
         },
         xAxis: { 
             type: 'category', 
