@@ -7,7 +7,7 @@
 
   <view class="card">
     <view class="card-header">
-      <view class="card-title">本周概览</view>
+      <view class="card-title">This Week</view>
     </view>
     
     <view class="chart-container">
@@ -16,19 +16,19 @@
     
     <view class="stats-grid">
       <view class="stat-box">
-        <view class="label">打卡次数</view>
+        <view class="label">Total Times</view>
         <view class="value" style="color: {{habit.color}}">{{weekStats.count}}</view>
       </view>
       <view class="stat-box">
-        <view class="label">坚持天数</view>
+        <view class="label">Days Active</view>
         <view class="value">{{weekStats.days}}</view>
       </view>
       <view class="stat-box">
-        <view class="label">周完成率</view>
+        <view class="label">Weekly Rate</view>
         <view class="value">{{weekStats.rate}}%</view>
       </view>
       <view class="stat-box">
-        <view class="label">小记数</view>
+        <view class="label">Notes</view>
         <view class="value">{{weekStats.notes}}</view>
       </view>
     </view>
@@ -36,11 +36,11 @@
 
   <view class="card">
     <view class="card-header">
-      <view class="card-title">{{currentYear}}年{{currentMonth}}月</view>
+      <view class="card-title">{{currentYear}}-{{currentMonth}}</view>
     </view>
     
     <view class="calendar-weekdays">
-      <view wx:for="{{['一','二','三','四','五','六','日']}}" wx:key="*this" class="weekday">{{item}}</view>
+      <view wx:for="{{['Mon','Tue','Wed','Thu','Fri','Sat','Sun']}}" wx:key="*this" class="weekday">{{item}}</view>
     </view>
     
     <view class="calendar-days">
@@ -56,7 +56,7 @@
 
   <view class="card">
     <view class="card-header">
-      <view class="card-title">打卡记录</view>
+      <view class="card-title">Recent Activity</view>
     </view>
     
     <view class="history-list">
@@ -68,18 +68,18 @@
           </view>
           <view class="log-line"></view>
           <view class="log-content">
-            <view class="log-note">{{item.note || '坚持打卡'}}</view>
+            <view class="log-note">{{item.note || 'Tracked!'}}</view>
             <view class="log-tag" style="color: {{habit.color}}; border-color: {{habit.color}}30; background: {{habit.color}}10">Done</view>
           </view>
         </view>
       </block>
       
       <view wx:if="{{logsList.length === 0}}" class="empty-logs">
-        暂无记录，快去打个卡吧！
+        No history yet. Go track your first one!
       </view>
     </view>
   </view>
 
-  <view class="delete-zone" bindtap="deleteHabit">删除此习惯</view>
+  <view class="delete-zone" bindtap="deleteHabit">Delete Habit</view>
 
 </view>

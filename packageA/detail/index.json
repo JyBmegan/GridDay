@@ -1,5 +1,5 @@
 {
-  "navigationBarTitleText": "习惯详情",
+  "navigationBarTitleText": "Details",
   "usingComponents": {
     "ec-canvas": "../../ec-canvas/ec-canvas"
   }

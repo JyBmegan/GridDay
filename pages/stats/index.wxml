@@ -10,10 +10,10 @@
         <view class="header-left"><view class="title">Habit Data</view><view class="subtitle">Keep streak going</view></view>
         <view class="filter-trigger" catchtap="toggleDropdown" wx:if="{{categories.length > 0}}"><text class="filter-text">{{currentCategory}}</text><view class="arrow-icon">▼</view></view>
     </view>
-<view class="dropdown-menu {{showPlanDropdown ? 'show' : ''}}" catchtap="stopProp">
-    <view class="dropdown-item" bindtap="switchPlanCategory" data-cat="All">All</view>
-    <block wx:for="{{planFilterCats}}" wx:key="*this">
-        <view class="dropdown-item" bindtap="switchPlanCategory" data-cat="{{item}}">{{item}}</view>
+<view class="dropdown-menu {{showDropdown ? 'show' : ''}}" catchtap="stopProp">
+    <view class="dropdown-item" bindtap="switchCategory" data-cat="All">All</view>
+    <block wx:for="{{categories}}" wx:key="*this">
+        <view class="dropdown-item" bindtap="switchCategory" data-cat="{{item}}">{{item}}</view>
     </block>
 </view>
 
@@ -40,19 +40,30 @@
                     <view class="icon-box" style="background: {{habit.color}}15;">{{habit.icon}}</view>
                     <view class="name-box">
                         <view class="name">{{habit.name}}</view>
-                        <view class="count-text" style="color: {{habit.color}}">
+                        <view class="count-text" style="color: '#5d5d5d'">
                             {{displayMode==='trend' ? (currentView==='week'?habit.weekTotal:habit.monthTotal) : habit.totalCount}} 
-                            <text class="unit-text">hits</text>
+                            <text class="unit-text">times</text>
                         </view>
                     </view>
                 </view>
                 <view class="chart-area">
                     <block wx:if="{{displayMode === 'trend'}}">
-                        <view class="chart-week" wx:if="{{currentView === 'week'}}"><block wx:for="{{habit.weekData}}" wx:key="date" wx:for-item="day"><view class="week-col"><view class="bar-track"><view class="bar-active" style="height: {{day.heightPct}}%; background: {{day.count>0?habit.color:'#e0e0e0'}}"></view></view><text class="day-label">{{day.weekDay}}</text></view></block></view>
+                      <view class="chart-week" wx:if="{{currentView === 'week'}}">
+                        <block wx:for="{{habit.weekData}}" wx:key="date" wx:for-item="day">
+                          <view class="week-col">
+                            <view class="bar-track">
+                              <view class="bar-active" style = "height: {{day.heightPct}}%; background: {{day.count > 0 ? habit.color : '#e0e0e0'}}"></view>
+                            </view>
+                            <text class="day-label">{{day.weekDay}}</text>
+                          </view>
+                        </block>
+                      </view>
                         
                         <view class="chart-month" wx:if="{{currentView === 'month'}}">
                             <block wx:for="{{habit.monthData}}" wx:key="date" wx:for-item="day">
-                                <view class="month-pixel" style="background: {{day.isEmpty ? '#ebedf0' : habit.color}}; opacity: {{day.opacity}}"></view>
+                              <view class="month-pixel" style="background: {{day.isEmpty ? '#ebedf0' : habit.color}}; opacity: {{day.opacity}}">
+                                <text class="month-date-num" style="color: {{day.isEmpty ? '#ccc' : '#fff'}}">{{day.dayNum}}</text>
+                              </view>
                             </block>
                         </view>
                         

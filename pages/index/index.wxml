@@ -14,10 +14,10 @@
 
   <view class="dropdown-menu {{showDropdown ? 'show' : ''}}" catchtap="stopProp">
     <view 
-      class="dropdown-item {{currentCategory === '全部' ? 'active' : ''}}" 
+      class="dropdown-item {{currentCategory === 'All' ? 'active' : ''}}" 
       bindtap="switchCategory" 
-      data-cat="全部">
-      全部
+      data-cat="All">
+      All
     </view>
     <block wx:for="{{categories}}" wx:key="*this">
       <view 
@@ -47,8 +47,8 @@
           </view>
         </view>
         <view class="card-footer-text">
-           <text style="color: #999; font-size: 11px;">{{habit.category || '默认'}}</text>
-           <text style="color: {{habit.color}}; font-weight: bold; margin-left: 5px;">今日: {{habit.count}}次</text>
+           <text style="color: #999; font-size: 11px;">{{habit.category || 'General'}}</text>
+           <text style="color: {{habit.color}}; font-weight: bold; margin-left: 5px;">Today: {{habit.count}} Times</text>
         </view>
       </view>
     </block>
@@ -56,7 +56,7 @@
 
   <view class="empty-state" wx:else>
     <view class="empty-text">
-      {{currentCategory === '全部' ? '还没有习惯，去添加一个吧 🌱' : '“' + currentCategory + '”分类下暂无习惯'}}
+      {{currentCategory === 'All' ? 'Add a habit to start 🌱' : '“' + currentCategory + '”No habits yet'}}
     </view>
   </view>
 
@@ -66,16 +66,16 @@
     <view class="modal-card" catchtap="stopProp">
       <view class="modal-header">
         <view class="modal-icon">{{currentHabit.icon}}</view>
-        <view class="modal-title">完成打卡！</view>
+        <view class="modal-title">Tracked!</view>
       </view>
       <view class="modal-body">
         <view class="modal-name">{{currentHabit.name}}</view>
-        <view class="modal-time"><text class="label">打卡时间</text><text class="value">{{currentTime}}</text></view>
+        <view class="modal-time"><text class="label">Completed at</text><text class="value">{{currentTime}}</text></view>
         <view class="modal-input-box">
-          <input class="modal-input" placeholder="写一句小记... (可选)" placeholder-style="color:#ccc" bindinput="bindNoteInput" value="{{note}}"/>
+          <input class="modal-input" placeholder="Write something... (Selected)" placeholder-style="color:#ccc" bindinput="bindNoteInput" value="{{note}}"/>
         </view>
       </view>
-      <button class="confirm-btn" bindtap="confirmCheckIn" style="background: {{currentHabit.color}};">确认记录</button>
+      <button class="confirm-btn" bindtap="confirmCheckIn" style="background: {{currentHabit.color}};">Save</button>
     </view>
   </view>
 

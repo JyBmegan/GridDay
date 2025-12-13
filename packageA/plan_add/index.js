@@ -1,39 +1,72 @@
 Page({
   data: {
-    // --- 基础信息 ---
     title: '',
-    
-    // --- 分类管理 ---
     category: '', 
-    categories: [], // 初始为空，由用户添加
+    categories: [], 
     customCategory: '',
     showAddCategory: false,
-
-    // --- 样式素材 (与打卡页统一的莫兰迪/多巴胺色盘) ---
+    // 备选颜色和图标
     colors: [
-      '#ff9f43', '#ff6b6b', '#ee5253', '#ff9ff3', '#f368e0', '#fab1a0', '#e17055', '#d63031', 
-      '#feca57', '#00d2d3', '#1dd1a1', '#10ac84', '#c8d6e5', '#576574', '#222f3e', '#b8e994', 
-      '#54a0ff', '#2e86de', '#5f27cd', '#341f97', '#48dbfb', '#0abde3', '#8395a7', '#222f3e', 
-      '#a8d8ea', '#aa96da', '#fcbad3', '#ffffd2', '#84817a', '#d1ccc0', '#ff5252', '#706fd3'
-    ],
+      /* Row 1: Red/Pink (Deep -> Light) */
+      '#492620', '#71323a', '#983e54', '#bf4a6e', '#e65588', '#e8779d', '#ea99b2', '#ecbbc7', '#eddcdb', 
+    
+      /* Row 2: Pink (Deep -> Light) */
+      '#4e301d', '#764430', '#9d5742', '#c56b54', '#ec7e66','#ed9882', '#edb19e', '#edb19e', '#ede3d6', 
+        
+      /* Row 3: Orange/Brown (Deep -> Light) */
+      '#523a1a', '#7a5828', '#a17535', '#c89243', '#efaf50','#efbe70', '#eecc90', '#eedbb0', '#ede9d0',
+        
+      /* Row 4: Yellow/Beige (Deep -> Light) */
+      '#473e1e', '#726725', '#9d8f2c', '#c8b833', '#f2e03a','#f0e55f', '#ede983', '#ebeea8', '#e8f2cc',
+        
+      /* Row 5: Green (Deep -> Light) */
+      '#3b4122', '#58652b', '#748834', '#91ac3d', '#adcf46','#bad969', '#c7e38c', '#d4edaf', '#e1f6d2', 
+        
+      /* Row 6: Mild Green (Deep -> Light)*/
+      '#303d27', '#3e5d32', '#4c7d3c', '#5a9d47', '#68bd51','#85cc74', '#a2da96', '#bfe8b9', '#dcf6db',
+    
+      /* Row 7: Cyan (Deep -> Light)*/
+      '#263936', '#3b564e', '#4f7366', '#64907e', '#78ac96','#92beab', '#abd0bf', '#c5e2d4', '#def3e8',
+        
+      /* Row 8: Blue (Deep -> Light) */
+      '#1c3445', '#374e6b', '#526890', '#6d82b6', '#879bdb','#9db1e2', '#b3c6e8', '#c9dbef', '#dff0f5', 
+        
+      /* Row 9: Mild Mauve (Deep -> Light) */
+      '#2c2f46', '#49486c', '#666192', '#837ab8', '#a093dd','#b3a9e4', '#c5bfea', '#d7d5f0', '#e9ebf6', 
+    
+      /* Row 10: Purple (Deep -> Light) */
+      '#3c2947', '#5b426d', '#7a5a93', '#9972b9', '#b88ade','#c7a3e3', '#d5bce8', '#e3d5ed', '#f1edf2', 
+    
+      /* Row 11: 过渡 */
+      '#1e1524', '#3f3545', '#5f5466', '#7f7487','#9f93a8','#b4abbb', '#c9c2cd', '#ded9e0', '#f2f0f2',
+        
+      /* Row 12: 中性灰、高级灰、白色系 */
+      '#000000', '#1f1f1f', '#3d3d3d', '#5b5b5b','#797979','#989898', '#b6b6b6', '#d4d4d4', '#f2f2f2',],
+
     selectedColor: '#54a0ff', // 默认选中颜色
     
-    // --- 图标库 ---
-    emojis: [
-      '📅', '💼', '🏃', '🏋️', '🧘‍♀️', '🚲', '🏊', '🏀', '⚽️', '🏸', '🎾', '🥊', '🧗', '🤸', 
-      '💊', '💧', '💤', '🍎', '🍌', '🥑', '🥦', '🥩', '🍳', '☕️', '🍺', '🥢', '🧹', '🛌', 
-      '🛀', '🧼', '🧺', '🪴', '📚', '💻', '📝', '💡', '🎓', '💰', '📈', '⏰', '📱', '🔋', 
-      '🏆', '🎯', '✈️', '🎮', '🎸', '🎨', '🎤', '🎬', '🎧', '📷', '🎹', '🎲', '🧩', '🌞', 
-      '🌈', '🔥', '✨', '🎉', '🐶', '🐱', '🐹', '🐰', '🦊', '🌲', '🌵', '🌻', '🌊', '⭐️'
-    ],
+    emojis: [ '💻', '💼', '📅', '📊', '📝', '📁', '📌', '📎', 
+    '📞', '📧', '🗑️', '🖨️', '📈', '💡', '🧠', '⌚', '🏠', '🛒', '🛍️', '💵', '💳', '📦', '🔑', '🧹', '🍽️', '☕', '🚿', '🛌', '🛋️', '🧺', '🪴', '🔌', '🏃', '🏋️', '🧘', '🚲', '🏊', '🏀', '👣', '💊', '🩺', '🩹', '💧', '🍎', '🥗', '🏋️‍♀️', '🧗', '🥊', '🚗', '✈️', '🚇', '🚌', '⛽', '🗺️', '🚦', '🎉', 
+    '🎂', '🎁', '🎮', '🎧', '📖', '🎨', '🏖️', '🍿', '⚙️', '🔍', '🔔', '✅', '❌', '⚠️', '❤️', '⭐', '🔒', '👀', '🔥', '⚡', '🚫', '📢', '💬', '➕'],
     icon: '📅', // 默认图标
 
-    // --- 时间相关 ---
+// 传入开始时间 (HH:mm)，返回1小时后的时间 (HH:mm)
+// function getOneHourLater(timeStr) {
+//   if (!timeStr) return '';
+//   let [hours, minutes] = timeStr.split(':').map(Number);
+//   hours += 1;
+//   // 处理跨天情况 (比如 23:00 变成 00:00)
+//   if (hours >= 24) {
+//     hours = hours % 24; 
+//   // 补零格式化 (比如 9 变成 '09')
+//   const formatHour = hours.toString().padStart(2, '0');
+//   const formatMinute = minutes.toString().padStart(2, '0');
+//   return `${formatHour}:${formatMinute}`;
+// }
     date: '', 
     startTime: '09:00',
     endTime: '10:00',
     
-    // --- UI控制 ---
     showColorPicker: false
   },
 
@@ -41,37 +74,26 @@ Page({
     const now = new Date();
     const dateStr = `${now.getFullYear()}-${(now.getMonth()+1).toString().padStart(2,'0')}-${now.getDate().toString().padStart(2,'0')}`;
     
-    // 1. 读取历史分类列表
     const cachedCats = wx.getStorageSync('plan_categories') || [];
     
-    // 2. 读取日期（如果是从日历点击进来的）
     this.setData({ 
       date: options.date || dateStr,
       categories: cachedCats
     });
   },
 
-  // --- 输入绑定 ---
   bindTitle(e) { this.setData({ title: e.detail.value }); },
   bindDateChange(e) { this.setData({ date: e.detail.value }); },
   bindStartTimeChange(e) { this.setData({ startTime: e.detail.value }); },
   bindEndTimeChange(e) { this.setData({ endTime: e.detail.value }); },
 
-  // =========================================================
-  // 分类与绑定逻辑 (Category Logic)
-  // =========================================================
   
-  // 1. 选择分类 -> 自动应用该分类绑定的颜色/图标
+  // 选择分类 -> 自动应用该分类绑定的颜色/图标
   selectCategory(e) {
     const cat = e.currentTarget.dataset.cat;
-    
-    // 读取保存的设置
     const settings = wx.getStorageSync('plan_cat_settings') || {}; 
-    // settings 结构: { '工作': {color: '#xxx', icon: '💼'}, '运动': {color: '#yyy', icon: '🏃'} }
-    
     let updateData = { category: cat };
-    
-    // 如果这个分类之前存过颜色/图标，就自动选上
+
     if (settings[cat]) {
         if (settings[cat].color) updateData.selectedColor = settings[cat].color;
         if (settings[cat].icon) updateData.icon = settings[cat].icon;
@@ -80,17 +102,14 @@ Page({
     this.setData(updateData);
   },
 
-  // 2. 显示添加框
   toggleAddCategory() {
     this.setData({ showAddCategory: !this.data.showAddCategory });
   },
 
-  // 3. 绑定输入
   bindCategoryInput(e) {
     this.setData({ customCategory: e.detail.value });
   },
 
-  // 4. 确认添加分类
   confirmAddCategory() {
     const val = this.data.customCategory.trim();
     if (!val) return;
@@ -99,24 +118,22 @@ Page({
     if (!list.includes(val)) {
       list.push(val);
       wx.setStorageSync('plan_categories', list); // 存列表
-      
-      // 新分类默认给个随机色，并保存绑定关系
+
       const randomColor = this.data.colors[Math.floor(Math.random() * this.data.colors.length)];
       this.saveCatSettings(val, randomColor, this.data.icon);
 
       this.setData({ 
         categories: list,
-        category: val, // 选中它
+        category: val, 
         selectedColor: randomColor,
         customCategory: '',
         showAddCategory: false
       });
     } else {
-      wx.showToast({ title: '分类已存在', icon: 'none' });
+      wx.showToast({ title: 'Category Exised', icon: 'none' });
     }
   },
 
-  // 辅助：保存分类的颜色/图标设置
   saveCatSettings(cat, color, icon) {
       if (!cat) return;
       const settings = wx.getStorageSync('plan_cat_settings') || {};
@@ -124,9 +141,6 @@ Page({
       wx.setStorageSync('plan_cat_settings', settings);
   },
 
-  // =========================================================
-  // 样式选择逻辑 (Style Logic)
-  // =========================================================
 
   toggleColorPicker() { this.setData({ showColorPicker: !this.data.showColorPicker }); },
   
@@ -135,37 +149,37 @@ Page({
     const color = e.currentTarget.dataset.color;
     this.setData({ selectedColor: color, showColorPicker: false }); 
     
-    // 如果当前选中了分类，记录这个颜色偏好
     if (this.data.category) {
         this.saveCatSettings(this.data.category, color, this.data.icon);
     }
   },
 
-  // 选择图标 -> 同时更新当前分类的绑定配置
   selectEmoji(e) { 
     const icon = e.currentTarget.dataset.emoji;
     this.setData({ icon: icon });
-    
-    // 如果当前选中了分类，记录这个图标偏好
+
     if (this.data.category) {
         this.saveCatSettings(this.data.category, this.data.selectedColor, icon);
     }
   },
 
-  // =========================================================
-  // 保存逻辑 (Save Logic)
-  // =========================================================
   savePlan() {
     const { title, date, startTime, endTime, category, selectedColor, icon } = this.data;
     
-    if (!title) return wx.showToast({ title: '请输入日程内容', icon: 'none' });
+    if (!title) return wx.showToast({ title: 'Add Your Plan', icon: 'none' });
     
-    // 计算时长 (小时)
-    // 兼容 iOS 格式: YYYY/MM/DD
+    // 计算时长 (小时), 兼容 iOS 格式: YYYY/MM/DD
     const start = new Date(`${date.replace(/-/g, '/')} ${startTime}`);
     const end = new Date(`${date.replace(/-/g, '/')} ${endTime}`);
     
-    if (end <= start) return wx.showToast({ title: '结束时间需晚于开始', icon: 'none' });
+    if (end <= start) {
+      return wx.showModal({
+        title: 'Error', 
+        content: 'End time must be after start time', 
+        showCancel: false, 
+        confirmText: 'OK'
+      });
+    }
     
     const durationHours = (end - start) / (1000 * 60 * 60);
 
@@ -176,7 +190,7 @@ Page({
       date, 
       startTime, 
       endTime, 
-      category: category || '未分类',
+      category: category || 'Uncategorized',
       color: selectedColor,
       icon: icon, 
       duration: durationHours.toFixed(1)
@@ -186,7 +200,7 @@ Page({
     plans.push(newPlan);
     wx.setStorageSync('plans', plans);
 
-    wx.showToast({ title: '已添加', icon: 'success' });
+    wx.showToast({ title: 'Done!', icon: 'success' });
     setTimeout(() => wx.navigateBack(), 1000);
   }
 })

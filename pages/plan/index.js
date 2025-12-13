@@ -16,22 +16,18 @@ Page({
     const today = new Date();
     const dateStr = this.data.selectedDate || this.formatDate(today);
     
-    // --- 调试日志 ---
     const allPlans = wx.getStorageSync('plans') || [];
     console.log('【Plan页面】读取缓存总数:', allPlans.length);
     console.log('【Plan页面】当前选中日期:', dateStr);
-    // ----------------
     
     this.initCalendar(new Date(dateStr));
     this.generateTimeSlots();
   },
 
-  // ★★★ 核心修复：日期标准化工具 ★★★
-  // 无论输入 "2024-6-1", "2024/06/01", "2024-06-1"，统一输出 "2024-06-01"
   normalizeDate(dateInput) {
     if (!dateInput) return '';
     const dateObj = new Date(dateInput.toString().replace(/-/g, '/'));
-    if (isNaN(dateObj.getTime())) return dateInput; // 如果解析失败，返回原值
+    if (isNaN(dateObj.getTime())) return dateInput; 
     
     const y = dateObj.getFullYear();
     const m = (dateObj.getMonth() + 1).toString().padStart(2, '0');
@@ -42,7 +38,6 @@ Page({
   initCalendar(dateObj) {
     const year = dateObj.getFullYear();
     const month = dateObj.getMonth() + 1;
-    // 确保 selectedDate 也是标准格式
     const dateStr = this.normalizeDate(this.formatDate(dateObj));
 
     this.setData({
@@ -64,10 +59,7 @@ Page({
     for (let i = 0; i < firstDay; i++) days.push({ empty: true });
     
     for (let i = 1; i <= daysInMonth; i++) {
-      // 生成标准格式：2024-06-01
       const dStr = `${year}-${month.toString().padStart(2,'0')}-${i.toString().padStart(2,'0')}`;
-      
-      // ★★★ 修复：使用 normalizeDate 进行宽松匹配 ★★★
       const dayPlans = allPlans.filter(p => this.normalizeDate(p.date) === dStr);
       
       // 提取颜色点
@@ -88,7 +80,6 @@ Page({
   loadTimeline(dateStr) {
     const allPlans = wx.getStorageSync('plans') || [];
     
-    // ★★★ 修复：使用宽松匹配筛选今日计划 ★★★
     const targetDate = this.normalizeDate(dateStr);
     const todayPlans = allPlans.filter(p => this.normalizeDate(p.date) === targetDate);
 
@@ -98,7 +89,6 @@ Page({
     const catMap = {};
     
     const processed = todayPlans.map(p => {
-      // 安全处理时间字符串
       if (!p.startTime || !p.endTime) return null;
 
       const [startH, startM] = p.startTime.split(':').map(Number);
@@ -110,12 +100,11 @@ Page({
       const hours = durationMinutes / 60;
 
       total += hours;
-      // 颜色兜底
       const color = p.color || '#54a0ff';
       if (!catMap[p.category]) catMap[p.category] = { name: p.category, hours: 0, color: color };
       catMap[p.category].hours += hours;
 
-      // 计算 CSS 位置
+
       const top = (startMinutes / 60) * HOUR_HEIGHT;
       const height = (durationMinutes / 60) * HOUR_HEIGHT;
 
@@ -125,7 +114,7 @@ Page({
         // 关键：box-sizing 避免边框导致高度计算误差
         style: `top: ${top}px; height: ${height}px; background: ${color}20; border-left: 3px solid ${color}; color: ${color}; box-sizing: border-box;`
       };
-    }).filter(p => p !== null); // 过滤掉无效数据
+    }).filter(p => p !== null); 
 
     this.setData({ 
       timelinePlans: processed,
@@ -140,7 +129,7 @@ Page({
     if (!plan) return;
 
     wx.showActionSheet({
-        itemList: [`删除 "${plan.title}"`],
+        itemList: [`Delete "${plan.title}"`],
         itemColor: '#ff6b6b',
         success: (res) => {
             if (res.tapIndex === 0) {
@@ -158,7 +147,7 @@ Page({
     // 刷新
     this.generateCalendarGrid(this.data.year, this.data.month);
     this.loadTimeline(this.data.selectedDate);
-    wx.showToast({ title: '已删除', icon: 'success' });
+    wx.showToast({ title: 'Deleted', icon: 'success' });
   },
 
   generateTimeSlots() {

@@ -12,7 +12,7 @@ Page({
     planCategories: [], // 仅用于饼图和统计
     planSummary: { totalHours: 0, count: 0, activeDays: 0, topCat: '-' },
     planTrendData: { y: [], series: [] },
-    planFilterCats: [], // ★★★ 修复：这是专门给下拉菜单用的完整列表
+    planFilterCats: [], 
     currentPlanCategory: 'All', 
     showPlanDropdown: false,
     
@@ -43,7 +43,6 @@ Page({
     setTimeout(() => this.loadData(), 200);
   },
 
-  // --- 辅助函数 ---
   safeDate(dateStr) {
     if (!dateStr) return new Date();
     const cleanStr = dateStr.toString().replace(/-/g, '/').split(' ')[0]; 
@@ -60,7 +59,10 @@ Page({
   },
   pad(n) { return n.toString().padStart(2, '0'); },
 
-  // --- 交互 ---
+  stopProp(){
+    return;
+  },
+
   switchStatType(e) {
     this.chartInstances = {}; 
     this.setData({ statType: e.currentTarget.dataset.type });
@@ -120,9 +122,7 @@ Page({
     }
   },
 
-  // =================================================================
-  // PLAN STATS (修复核心逻辑：分离菜单数据源与图表数据源)
-  // =================================================================
+
   loadPlanStats() {
     const plans = wx.getStorageSync('plans') || [];
     const view = this.data.currentView;
@@ -130,7 +130,7 @@ Page({
     const anchorYear = anchor.getFullYear();
     const anchorMonth = anchor.getMonth();
     
-    // 1. 确定筛选范围
+    // 确定筛选范围
     let startStr = '', endStr = '';
     let yLabels = []; let dataLength = 0; let getIndex = () => -1; let tHeight = 250;
 
@@ -163,30 +163,25 @@ Page({
         tHeight = 400;
     }
 
-    // 2. 第一层筛选：日期范围
-    // dateFilteredPlans 包含当前视图内的所有记录（未受分类筛选影响）
+    // 第一层筛选：日期范围，dateFilteredPlans 包含当前视图内的所有记录（未受分类筛选影响）
     const dateFilteredPlans = plans.filter(p => {
         const pDate = this.fmt(this.safeDate(p.date));
         return pDate >= startStr && pDate <= endStr;
     });
 
-    // ★★★ 修复1：基于日期筛选后的数据，提取所有类别供下拉菜单使用 ★★★
-    // 这样无论后面怎么选 currentPlanCategory，这个列表永远是完整的
     const uniqueCatsInView = [...new Set(dateFilteredPlans.map(p => p.category))];
 
-    // 3. 第二层筛选：分类
-    // finalPlans 是最终用于画图和计算统计的数据
+    // 第二层筛选：分类，finalPlans 是最终用于画图和计算统计的数据
     let finalPlans = dateFilteredPlans;
-    let targetColor = '#54a0ff'; 
+    let targetColor = '#212121'; 
     
     if (this.data.currentPlanCategory !== 'All') {
         finalPlans = dateFilteredPlans.filter(p => p.category === this.data.currentPlanCategory);
-        // 尝试获取该分类的颜色
         const sample = dateFilteredPlans.find(p => p.category === this.data.currentPlanCategory);
         if (sample && sample.color) targetColor = sample.color;
     }
     
-    // 4. 聚合数据 (使用 finalPlans)
+    // 聚合数据 (使用 finalPlans)
     const valMap = {};
     const catMap = {}; 
     const seriesMap = {};
@@ -214,7 +209,7 @@ Page({
         total += dur;
         
         // Pie
-        if (!catMap[p.category]) catMap[p.category] = { name: p.category, value: 0, color: p.color || '#54a0ff' };
+        if (!catMap[p.category]) catMap[p.category] = { name: p.category, value: 0, color: p.color || '#5d5d5d' };
         catMap[p.category].value += dur;
 
         // Bar
@@ -230,7 +225,7 @@ Page({
 
     if (maxDailyDuration === 0) maxDailyDuration = 1;
 
-    // 5. 生成 Heatmap Grid
+    // 生成 Heatmap Grid
     let heatmapGrid = [];
     let isYearView = (view === 'year');
 
@@ -300,7 +295,7 @@ Page({
         planSummary: { totalHours: total.toFixed(1), count: finalPlans.length, activeDays: activeDaysSet.size, topCat },
         footerData: {
             heatmap: { label1: 'Active Days', val1: activeDaysSet.size, label2: 'Total Hours', val2: total.toFixed(1) },
-            trend:   { label1: 'Daily Avg', val1: avgDur+'h', label2: 'Top Cat', val2: topCat },
+            trend:   { label1: 'Daily Average', val1: avgDur+'h', label2: 'Top Category', val2: topCat },
             dist:    { label1: 'Categories', val1: pieData.length, label2: 'Coverage', val2: '100%' },
             curve:   { label1: 'Peak Hour', val1: maxHourVal>0?`${peakHour}:00`:'-', label2: 'Intensity', val2: maxHourVal }
         }
@@ -314,9 +309,8 @@ Page({
   },
 
   // ECharts Init
-  // ECharts Init
   initPlanBar(yLabels, series, view) {
-    // 1. 统一定义 Option (这样无论是初始化还是更新，样式都一致，不会丢样式)
+    // 统一定义 Option 
     const option = {
         tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' }, confine: true },
         grid: { left: '3%', right: '5%', bottom: '2%', top: '2%', containLabel: true },
@@ -338,15 +332,11 @@ Page({
         series: series.length > 0 ? series : [{type: 'bar', data: []}]
     };
 
-    // 2. 如果图表实例已存在，执行更新
     if (this.chartInstances['planBar']) {
-        // ★★★ 核心修复：添加第二个参数 true (notMerge) ★★★
-        // 这告诉 ECharts：清空之前的系列，只显示现在给你的系列
         this.chartInstances['planBar'].setOption(option, true);
         return;
     }
 
-    // 3. 如果图表不存在，执行初始化
     const comp = this.selectComponent('#chart-plan-bar');
     if(!comp) return;
     comp.init((canvas, width, height, dpr) => {
@@ -394,9 +384,6 @@ Page({
     });
   },
 
-  // =================================================================
-  // HABIT STATS
-  // =================================================================
   loadHabitStats() {
     const habits = wx.getStorageSync('habits') || [];
     const categories = wx.getStorageSync('categories') || [];
@@ -408,10 +395,19 @@ Page({
     }
     
     const anchor = new Date(this.data.anchorDate);
-    const weekLabels = ['日','一','二','三','四','五','六'];
+    const weekLabels = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
     
     const last7Days = []; for(let i=6; i>=0; i--) { const d = new Date(anchor); d.setDate(d.getDate() - i); last7Days.push({ str: this.fmt(d), label: weekLabels[d.getDay()] }); }
-    const last30Days = []; for(let i=29; i>=0; i--) { const d = new Date(anchor); d.setDate(d.getDate() - i); last30Days.push(this.fmt(d)); }
+    
+    const anchorYear = anchor.getFullYear();
+    const anchorMonth = anchor.getMonth();
+    const daysInCurrentMonth = new Date(anchorYear, anchorMonth + 1, 0).getDate();
+    const currentMonthDays = [];
+    for(let i = 1; i <= daysInCurrentMonth; i++) {
+        const d = new Date(anchorYear, anchorMonth, i);
+        currentMonthDays.push(this.fmt(d));
+    }
+
     const now = new Date(); const currentYearStr = now.getFullYear().toString();
     const monthsOfYear = []; for(let i=0; i<12; i++) { const m = (i + 1).toString().padStart(2, '0'); monthsOfYear.push(`${currentYearStr}-${m}`); }
 
@@ -426,9 +422,16 @@ Page({
         });
         const weekTotal = weekData.reduce((acc, cur) => acc + (cur.count>0?1:0), 0);
 
-        const monthData = last30Days.map(dateStr => {
+        const monthData = currentMonthDays.map(dateStr => {
             const count = logs.filter(l => (typeof l==='string'?l:l.time).startsWith(dateStr)).length;
-            return { date: dateStr, count, opacity: count > 0 ? (count >= 3 ? 1 : 0.6) : 1, isEmpty: count === 0 };
+            const dayNum = parseInt(dateStr.split('-')[2]); 
+            return { 
+                date: dateStr, 
+                dayNum: dayNum, 
+                count, 
+                opacity: count > 0 ? (count >= 3 ? 1 : 0.6) : 1, 
+                isEmpty: count === 0 
+            };
         });
         const monthTotal = monthData.reduce((acc, cur) => acc + cur.count, 0);
 
@@ -460,7 +463,7 @@ Page({
     if (this.data.displayMode === 'time') { 
         setTimeout(() => this.initAllHabitTimeCharts(3), 300); 
     }
-  },
+  }, 
 
   toggleDropdown() { this.setData({ showDropdown: !this.data.showDropdown }); },
   closeDropdown() { if(this.data.showDropdown) this.setData({ showDropdown: false }); if(this.data.showPlanDropdown) this.setData({ showPlanDropdown: false }); },
@@ -471,15 +474,50 @@ Page({
   
   initAllHabitTimeCharts(retry) {
     if(retry <= 0) return;
+    
+
+    const xLabels = Array.from({length: 24}, (_, i) => i);
+
     this.data.filteredHabits.forEach(habit => {
       const comp = this.selectComponent(`#chart-time-${habit.id}`);
       if(comp) {
         comp.init((canvas, width, height, dpr) => {
           const chart = echarts.init(canvas, null, { width, height, devicePixelRatio: dpr });
+          
           const option = {
-            grid: { left: 0, right: 0, top: 5, bottom: 0 },
-            xAxis: { type: 'category', show: false }, yAxis: { show: false, min: 0 },
-            series: [{ data: habit.hoursData, type: 'line', smooth: true, symbol: 'none', lineStyle: { width: 3, color: habit.color }, areaStyle: { color: new echarts.graphic.LinearGradient(0,0,0,1, [{offset:0, color:habit.color}, {offset:1, color:'rgba(255,255,255,0)'}]) } }]
+
+            grid: { left: 10, right: 10, top: 10, bottom: 20 },
+
+            xAxis: { 
+                type: 'category', 
+                data: xLabels, 
+                show: true, 
+                axisLine: { show: false }, 
+                axisTick: { show: false }, 
+                axisLabel: { 
+                    interval: 3, 
+                    color: '#5d5d5d', 
+                    fontSize: 10,
+                    margin: 8 
+                }
+            }, 
+    
+            yAxis: { show: false, min: 0 },
+            
+            series: [{ 
+                data: habit.hoursData, 
+                type: 'line', 
+                smooth: 0.8, 
+                symbol: 'none',
+                lineStyle: { width: 3, color: habit.color }, 
+                areaStyle: { 
+                    color: new echarts.graphic.LinearGradient(0,0,0,1, [
+                        {offset:0, color:habit.color}, 
+                        {offset:1, color:'rgba(255,255,255,0)'}
+                    ]),
+                    opacity: 0.5 
+                } 
+            }]
           };
           chart.setOption(option);
           return chart;

@@ -14,10 +14,11 @@
       ]
     }
   ],
+
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#FAFBFC",
-    "navigationBarTitleText": "Habit Tracker",
+    "navigationBarTitleText": "GridDay",
     "navigationBarTextStyle": "black"
   },
   "tabBar": {
@@ -28,19 +29,19 @@
     "list": [
       {
         "pagePath": "pages/index/index",
-        "text": "打卡",
+        "text": "Tracker",
         "iconPath": "images/tab_home.png",
         "selectedIconPath": "images/tab_home_active.png"
       },
       {
         "pagePath": "pages/stats/index",
-        "text": "数据",
+        "text": "Stats",
         "iconPath": "images/tab_stats.png",
         "selectedIconPath": "images/tab_stats_active.png"
       },
       {
         "pagePath": "pages/plan/index",
-        "text": "计划",
+        "text": "Schedule",
         "iconPath": "images/tab_plan.png",
         "selectedIconPath": "images/tab_plan_active.png"
       }
