@@ -1,0 +1,8 @@
+{
+  "setting": {
+    "enhance": true,
+    "es6": true,
+    "postcss": true,
+    "minified": true
+  }
+}

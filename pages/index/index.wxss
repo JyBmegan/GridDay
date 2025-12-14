@@ -1,6 +1,15 @@
+page {
+  width: 100%;
+  overflow-x: hidden;
+}
+
 .container { 
-  padding: 24px 20px; padding-bottom: 100px; 
+  padding: 24px 20px; 
+  padding-bottom: 100px; 
   position: relative; 
+  box-sizing: border-box;
+  width: 100%;
+  overflow-x: hidden;
 }
 
 .header-row {
@@ -44,15 +53,43 @@
 .dropdown-item:active { background: #f5f5f5; }
 .dropdown-item.active { background: #f0f2f5; color: #333; font-weight: bold; }
 
-.grid-container { display: grid; grid-template-columns: 1fr; gap: 20px; }
-.habit-card { background: white; border-radius: 24px; padding: 20px; box-shadow: 0 8px 24px rgba(0,0,0,0.04); }
+.grid-container { 
+  display: grid; 
+  grid-template-columns: 1fr; 
+  gap: 20px; 
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.habit-card { 
+  background: white; 
+  border-radius: 24px; 
+  padding: 20px; 
+  box-shadow: 0 8px 24px rgba(0,0,0,0.04); 
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
 .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
 .icon-title-row { display: flex; align-items: center; gap: 12px; }
 .icon-box { width: 42px; height: 42px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
 .habit-name { font-size: 17px; font-weight: 700; color: #333; }
 .check-btn-wrap { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: transform 0.1s; }
 .check-btn-wrap:active { transform: scale(0.9); }
-.heatmap-container { display: flex; gap: 3px; margin-bottom: 12px; overflow-x: auto; padding-bottom: 5px; -webkit-overflow-scrolling: touch; }
+
+.heatmap-container { 
+  display: flex; 
+  gap: 3px; 
+  margin-bottom: 12px; 
+  overflow-x: scroll; 
+  padding-bottom: 5px; 
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+  white-space: nowrap;
+  /* box-sizing: border-box; */
+}
+
 .heatmap-container::-webkit-scrollbar { display: none; }
 .heatmap-week-col { display: flex; flex-direction: column; gap: 3px; }
 .heat-box { width: 9px; height: 9px; border-radius: 2px; background-color: #f0f2f5; transition: all 0.3s; }
