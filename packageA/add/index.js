@@ -1,5 +1,7 @@
 Page({
   data: {
+    isEdit: false,
+    habitId: null,
     name: '',
     icon: '',
     goal: 1,
@@ -54,11 +56,40 @@ Page({
     '🎂', '🎁', '🎮', '🎧', '📖', '🎨', '🏖️', '🍿', '⚙️', '🔍', '🔔', '✅', '❌', '⚠️', '❤️', '⭐', '🔒', '👀', '🔥', '⚡', '🚫', '📢', '💬', '➕']
   },
 
-  onLoad() {
-    const cachedCats = wx.getStorageSync('categories');
-    if (cachedCats && cachedCats.length > 0) {
-      this.setData({ categoryList: cachedCats });
+  onLoad(options) {
+    const cachedCats = wx.getStorageSync('categories') || [];
+    this.setData({ categoryList: cachedCats });
+
+    // Check for ID to enable Edit Mode
+    if (options.id) {
+      wx.setNavigationBarTitle({ title: 'Edit Habit' });
+      this.loadHabitData(options.id);
     }
+  },
+
+  loadHabitData(id) {
+    const habits = wx.getStorageSync('habits') || [];
+    const target = habits.find(h => h.id == id); 
+    if (target) {
+      this.setData({
+        isEdit: true,
+        habitId: target.id,
+        name: target.name,
+        icon: target.icon,
+        selectedColor: target.color,
+        goal: target.goal || 1,
+        category: target.category || '',
+        categoryList: this.ensureCategoryExists(target.category)
+      });
+    }
+  },
+
+  ensureCategoryExists(cat) {
+    let list = this.data.categoryList;
+    if (cat && !list.includes(cat)) {
+      list.push(cat);
+    }
+    return list;
   },
 
   bindNameInput(e) { this.setData({ name: e.detail.value }) },
@@ -70,6 +101,29 @@ Page({
   selectCategory(e) { this.setData({ category: e.currentTarget.dataset.item }); },
   toggleAddCategory() { this.setData({ showAddCategory: !this.data.showAddCategory }); },
   bindCategoryInput(e) { this.setData({ customCategory: e.detail.value }); },
+
+  deleteCategory(e) {
+    const targetCat = e.currentTarget.dataset.item;
+  
+    wx.showModal({
+      title: 'Delete Category',
+      content: `Remove "${targetCat}" from options?`,
+      confirmColor: '#ff6b6b',
+      success: (res) => {
+        if (res.confirm) {
+          const list = this.data.categoryList.filter(c => c !== targetCat);
+          wx.setStorageSync('categories', list);
+        // 更新页面数据
+          this.setData({ 
+            categoryList: list,
+            category: this.data.category === targetCat ? '' : this.data.category
+          });
+        
+          wx.showToast({ title: 'Deleted', icon: 'none' });
+        }
+      }
+    });
+  },
   
   confirmAddCategory() {
     const val = this.data.customCategory.trim();

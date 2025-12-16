@@ -1,5 +1,7 @@
 Page({
   data: {
+    isEdit: false,
+    planId: null,
     title: '',
     category: '', 
     categories: [], 
@@ -73,14 +75,36 @@ Page({
   onLoad(options) {
     const now = new Date();
     const dateStr = `${now.getFullYear()}-${(now.getMonth()+1).toString().padStart(2,'0')}-${now.getDate().toString().padStart(2,'0')}`;
-    
     const cachedCats = wx.getStorageSync('plan_categories') || [];
     
     this.setData({ 
       date: options.date || dateStr,
       categories: cachedCats
     });
+
+    if (options.id) {
+      wx.setNavigationBarTitle({ title: 'Edit Plan' });
+      this.loadPlanData(options.id);
+   }
   },
+
+  loadPlanData(id) {
+    const plans = wx.getStorageSync('plans') || [];
+    const target = plans.find(p => p.id == id);
+    if (target) {
+        this.setData({
+            isEdit: true,
+            planId: target.id,
+            title: target.title,
+            date: target.date,
+            startTime: target.startTime,
+            endTime: target.endTime,
+            category: target.category,
+            selectedColor: target.color,
+            icon: target.icon
+        });
+    }
+},
 
   bindTitle(e) { this.setData({ title: e.detail.value }); },
   bindDateChange(e) { this.setData({ date: e.detail.value }); },
@@ -132,6 +156,25 @@ Page({
     } else {
       wx.showToast({ title: 'Category Exised', icon: 'none' });
     }
+  },
+
+  deleteCategory(e) {
+    const targetCat = e.currentTarget.dataset.cat;
+    // Optional: Confirm dialog
+    wx.showModal({
+        title: 'Delete Category',
+        content: `Remove "${targetCat}"?`,
+        success: (res) => {
+            if (res.confirm) {
+                const list = this.data.categories.filter(c => c !== targetCat);
+                wx.setStorageSync('plan_categories', list);
+                this.setData({ 
+                    categories: list,
+                    category: this.data.category === targetCat ? '' : this.data.category
+                });
+            }
+        }
+    });
   },
 
   saveCatSettings(cat, color, icon) {
@@ -198,6 +241,29 @@ Page({
 
     let plans = wx.getStorageSync('plans') || [];
     plans.push(newPlan);
+
+    if (isEdit) {
+      const index = plans.findIndex(p => p.id == planId);
+      if (index !== -1) {
+          plans[index] = {
+              ...plans[index],
+              title, date, startTime, endTime, category: category || 'Uncategorized',
+              color: selectedColor, icon, duration: durationHours.toFixed(1)
+          };
+          wx.showToast({ title: 'Updated!', icon: 'success' });
+      }
+  } else {
+      const newPlan = {
+          id: Date.now(),
+          type: 'plan',
+          title, date, startTime, endTime, 
+          category: category || 'Uncategorized',
+          color: selectedColor, icon, duration: durationHours.toFixed(1)
+      };
+      plans.push(newPlan);
+      wx.showToast({ title: 'Created!', icon: 'success' });
+  }
+
     wx.setStorageSync('plans', plans);
 
     wx.showToast({ title: 'Done!', icon: 'success' });

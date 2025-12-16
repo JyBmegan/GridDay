@@ -152,5 +152,46 @@ Page({
   formatDate(d) { return `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}-${d.getDate().toString().padStart(2,'0')}`; },
   getTodayStr() { return this.formatDate(new Date()); },
   goToAdd() { wx.navigateTo({ url: '/packageA/add/index' }); },
-  goToDetail(e) { wx.navigateTo({ url: `/packageA/detail/index?id=${e.currentTarget.dataset.id}` }); }
+  
+  // Add Edit and Delte button
+  showHabitAction(e) {
+    const id = e.currentTarget.dataset.id;
+    const habit = this.data.allHabits.find(h => h.id === id);
+    if (!habit) return;
+
+    wx.showActionSheet({
+      itemList: ['View Detail', 'Edit Habit', 'Delete'],
+      itemColor: '#333333',
+      success: (res) => {
+        if (res.tapIndex === 0) {
+          // 1. View Detail 
+          wx.navigateTo({ url: `/packageA/detail/index?id=${id}` });
+        } else if (res.tapIndex === 1) {
+          // 2. Edit Habit 
+          wx.navigateTo({ url: `/packageA/add/index?id=${id}` });
+        } else if (res.tapIndex === 2) {
+          // 3. Delete
+          this.deleteHabitConfirm(id, habit.name);
+        }
+      }
+    });
+  },
+
+  deleteHabitConfirm(id, name) {
+    wx.showModal({
+      title: 'Delete Habit?',
+      content: `Delete "${name}" permanently?`,
+      confirmColor: '#ff4757',
+      success: (res) => {
+        if (res.confirm) {
+          let habits = wx.getStorageSync('habits') || [];
+          const newHabits = habits.filter(h => h.id !== id);
+          wx.setStorageSync('habits', newHabits);
+          
+          this.loadHabits(); // 刷新首页列表
+          wx.showToast({ title: 'Deleted', icon: 'success' });
+        }
+      }
+    });
+  },
 })

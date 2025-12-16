@@ -3,24 +3,31 @@
 
 <!-- Name of the Item -->
   <view class="input-group">
-    <input class="main-input" placeholder="What needs to be done?" placeholder-class="ph" bindinput="bindTitle" auto-focus />
+    <input class="main-input" 
+    value="{{title}}"
+    placeholder="What needs to be done?" placeholder-class="ph" bindinput="bindTitle" auto-focus />
   </view>
 
 <!-- Category -->
-  <view class="section-title">Category</view>
+  <view class="section-title" style="display: flex; justify-content: space-between; align-items: center;">
+    <text>Category</text>
+    <text style="font-size: 12px; color: #bbb; font-weight: normal;">(Long press to delete)</text>
+  </view>
+
+  <view class="category-wrapper">
+     </view>
 
   <view class="category-wrapper">
     <view class="category-list">
-
       <view wx:for="{{categories}}" wx:key="*this"
         class="cat-tag {{category === item ? 'active' : ''}}" 
-        bindtap="selectCategory" data-cat="{{item}}"
+        bindtap="selectCategory" 
+        bindlongpress="deleteCategory"
+        data-cat="{{item}}"
         style="{{category === item ? 'background:'+selectedColor+'; border-color:'+selectedColor : ''}}">
         {{item}}
       </view>
-
-      <view class="cat-tag add-btn" bindtap="toggleAddCategory" wx:if="{{!showAddCategory}}">+</view>
-
+      <view class="cat-tag add-btn"     bindtap="toggleAddCategory" wx:if="   {{!showAddCategory}}">+</view>
     </view>
 
     <view class="add-cat-box" wx:if="{{showAddCategory}}">

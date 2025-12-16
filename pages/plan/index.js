@@ -22,6 +22,10 @@ Page({
     
     this.initCalendar(new Date(dateStr));
     this.generateTimeSlots();
+
+    if (this.data.selectedDate) {
+      this.loadTimeline(this.data.selectedDate);
+    }
   },
 
   normalizeDate(dateInput) {
@@ -111,8 +115,8 @@ Page({
       return {
         ...p,
         color, 
-        // 关键：box-sizing 避免边框导致高度计算误差
-        style: `top: ${top}px; height: ${height}px; background: ${color}20; border-left: 3px solid ${color}; color: ${color}; box-sizing: border-box;`
+        // box-sizing 避免边框导致高度计算误差
+        style: `top: ${top}px; height: ${height}px; background: ${color}40; border-left: 3px solid ${color}; color: ${color}; box-sizing: border-box;`
       };
     }).filter(p => p !== null); 
 
@@ -129,12 +133,15 @@ Page({
     if (!plan) return;
 
     wx.showActionSheet({
-        itemList: [`Delete "${plan.title}"`],
-        itemColor: '#ff6b6b',
+        itemList: ['Edit', 'Delete'],
         success: (res) => {
-            if (res.tapIndex === 0) {
-                this.deletePlan(id);
-            }
+          if (res.tapIndex === 0) {
+              wx.navigateTo({
+                  url: `/packageA/plan_add/index?id=${id}` 
+              });
+          } else if (res.tapIndex === 1) {
+              this.deletePlan(id);
+          }
         }
     });
   },

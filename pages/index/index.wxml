@@ -31,7 +31,7 @@
 
   <view class="grid-container" wx:if="{{filteredHabits.length > 0}}">
     <block wx:for="{{filteredHabits}}" wx:key="id" wx:for-item="habit">
-      <view class="habit-card" bindtap="goToDetail" data-id="{{habit.id}}">
+      <view class="habit-card" bindtap="showHabitAction" data-id="{{habit.id}}">
         <view class="card-header">
           <view class="icon-title-row">
             <view class="icon-box" style="background: {{habit.color}}15;"><text>{{habit.icon}}</text></view>

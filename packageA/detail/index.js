@@ -27,6 +27,26 @@ Page({
     }
   },
 
+
+  goToEdit() {
+    console.log('点击了编辑按钮'); // 调试用：看控制台有没有这句话
+    const url = `/packageA/add/index?id=${this.data.habit.id}`;
+    
+    wx.navigateTo({
+      url: url,
+      fail: (err) => {
+        console.error('跳转失败，请检查路径:', err);
+      }
+    });
+  },
+
+// Ensure onShow reloads data in case edit happened
+  onShow() {
+    if (this.habitId) {
+      this.loadHabit(); // Reload habit data to reflect changes
+    }
+  },
+
   loadHabit() {
     const habits = wx.getStorageSync('habits') || [];
     const habit = habits.find(h => h.id === this.habitId);
