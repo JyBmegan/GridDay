@@ -265,13 +265,10 @@ Page({
   },
 
   savePlan() {
-    console.log('Save button clicked'); // 调试：看控制台有没有这句话
     const { title, date, startTime, endTime, category, selectedColor, icon, isEdit, planId } = this.data;
     
-    // 1. 校验
     if (!title) return wx.showToast({ title: 'Please enter a title', icon: 'none' });
     
-    // 2. 时间计算
     try {
       const start = new Date(`${date.replace(/-/g, '/')} ${startTime}`);
       const end = new Date(`${date.replace(/-/g, '/')} ${endTime}`);
@@ -287,28 +284,20 @@ Page({
       
       const durationHours = (end - start) / (1000 * 60 * 60);
 
-      // 3. 构造数据对象
       let plans = wx.getStorageSync('plans') || [];
       
       if (isEdit) {
-          // 编辑模式：找到旧数据并替换
+          // 编辑模式：替换旧数据
           const index = plans.findIndex(p => p.id == planId);
           if (index !== -1) {
               plans[index] = {
-                  ...plans[index], // 保留其他可能存在的字段
+                  ...plans[index],
                   title, date, startTime, endTime, 
                   category: category || 'Uncategorized',
                   color: selectedColor, icon, 
                   duration: durationHours.toFixed(1)
               };
               wx.showToast({ title: 'Updated!', icon: 'success' });
-          } else {
-              // 极端情况：编辑时找不到原数据，当做新增处理
-              const newPlan = {
-                  id: Date.now(), type: 'plan', title, date, startTime, endTime, 
-                  category: category || 'Uncategorized', color: selectedColor, icon, duration: durationHours.toFixed(1)
-              };
-              plans.push(newPlan);
           }
       } else {
           // 新增模式
@@ -324,7 +313,6 @@ Page({
           wx.showToast({ title: 'Created!', icon: 'success' });
       }
 
-      // 4. 保存并返回
       wx.setStorageSync('plans', plans);
       setTimeout(() => wx.navigateBack(), 1000);
 
