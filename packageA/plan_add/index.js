@@ -1,5 +1,7 @@
 Page({
   data: {
+    isEdit: false,
+    planId: null,
     title: '',
     category: '', 
     categories: [], 
@@ -72,14 +74,92 @@ Page({
 
   onLoad(options) {
     const now = new Date();
-    const dateStr = `${now.getFullYear()}-${(now.getMonth()+1).toString().padStart(2,'0')}-${now.getDate().toString().padStart(2,'0')}`;
+    const dateStr = options.date || `${now.getFullYear()}-${(now.getMonth()+1).toString().padStart(2,'0')}-${now.getDate().toString().padStart(2,'0')}`;
     
+    const currentH = now.getHours();
+    const currentM = now.getMinutes();
+    const formatTime = (h, m) => `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}`;
+    let startTimeStr = formatTime(currentH, currentM);
+    
+    let endH = currentH + 1;
+    let endM = currentM;
+    
+    if (endH >= 24) {
+       endH = 23; endM = 59; 
+    }
+    const endTimeStr = formatTime(endH, endM);
     const cachedCats = wx.getStorageSync('plan_categories') || [];
-    
-    this.setData({ 
-      date: options.date || dateStr,
+
+    let initData = { 
+      date: dateStr,
+      startTime: startTimeStr,
+      endTime: endTimeStr,
       categories: cachedCats
-    });
+    };
+    
+    const copiedPlan = wx.getStorageSync('copied_plan_buffer');
+
+    if (options.id) {
+       wx.setNavigationBarTitle({ title: 'Edit Plan' });
+       this.loadPlanData(options.id);
+       this.setData({ categories: cachedCats }); 
+       return;
+    }
+
+    if (copiedPlan) {
+      wx.showToast({ title: 'Pasted from clipboard', icon: 'none' });
+      if (copiedPlan.duration) {
+          const [sh, sm] = startTimeStr.split(':').map(Number);
+          const durationMins = Math.round(parseFloat(copiedPlan.duration) * 60);
+      
+          let newEndTotalMins = (sh * 60 + sm) + durationMins;
+          let neh = Math.floor(newEndTotalMins / 60);
+          let nem = newEndTotalMins % 60;
+          
+          if (neh >= 24) { neh = 23; nem = 59; } 
+          endTimeStr = formatTime(neh, nem);
+      }
+
+      initData = {
+          ...initData,
+          title: copiedPlan.title,          
+          category: copiedPlan.category,     
+          selectedColor: copiedPlan.color,   
+          icon: copiedPlan.icon,            
+          endTime: endTimeStr,              
+          categories: this.ensureCategoryExists(copiedPlan.category, cachedCats)
+      };
+
+      wx.removeStorageSync('copied_plan_buffer');
+    }
+
+  this.setData(initData);
+  },
+
+  loadPlanData(id) {
+    const plans = wx.getStorageSync('plans') || [];
+    const target = plans.find(p => p.id == id);
+    if (target) {
+        this.setData({
+            isEdit: true,
+            planId: target.id,
+            title: target.title,
+            date: target.date,
+            startTime: target.startTime,
+            endTime: target.endTime,
+            category: target.category,
+            selectedColor: target.color,
+            icon: target.icon,
+            categories: this.ensureCategoryExists(target.category)
+        });
+    }
+  },
+
+  ensureCategoryExists(cat, list) {
+    if (cat && !list.includes(cat)) {
+      list.push(cat);
+    }
+    return list;
   },
 
   bindTitle(e) { this.setData({ title: e.detail.value }); },
@@ -134,11 +214,32 @@ Page({
     }
   },
 
+  deleteCategory(e) {
+    const targetCat = e.currentTarget.dataset.cat;
+    // Optional: Confirm dialog
+    wx.showModal({
+      title: 'Delete Category',
+      content: `Remove "${targetCat}"?`,
+      confirmColor: '#ff6b6b',
+      success: (res) => {
+        if (res.confirm) {
+          const list = this.data.categories.filter(c => c !== targetCat);
+          wx.setStorageSync('plan_categories', list);
+            this.setData({ 
+                categories: list,
+                category: this.data.category === targetCat ? '' : this.data.category
+            });
+          wx.showToast({ title: 'Deleted', icon: 'none' });
+        }
+      }
+    });
+  },
+
   saveCatSettings(cat, color, icon) {
-      if (!cat) return;
-      const settings = wx.getStorageSync('plan_cat_settings') || {};
-      settings[cat] = { color: color, icon: icon };
-      wx.setStorageSync('plan_cat_settings', settings);
+    if (!cat) return;
+    const settings = wx.getStorageSync('plan_cat_settings') || {};
+    settings[cat] = { color: color, icon: icon };
+    wx.setStorageSync('plan_cat_settings', settings);
   },
 
 
@@ -164,43 +265,72 @@ Page({
   },
 
   savePlan() {
-    const { title, date, startTime, endTime, category, selectedColor, icon } = this.data;
+    console.log('Save button clicked'); // 调试：看控制台有没有这句话
+    const { title, date, startTime, endTime, category, selectedColor, icon, isEdit, planId } = this.data;
     
-    if (!title) return wx.showToast({ title: 'Add Your Plan', icon: 'none' });
+    // 1. 校验
+    if (!title) return wx.showToast({ title: 'Please enter a title', icon: 'none' });
     
-    // 计算时长 (小时), 兼容 iOS 格式: YYYY/MM/DD
-    const start = new Date(`${date.replace(/-/g, '/')} ${startTime}`);
-    const end = new Date(`${date.replace(/-/g, '/')} ${endTime}`);
-    
-    if (end <= start) {
-      return wx.showModal({
-        title: 'Error', 
-        content: 'End time must be after start time', 
-        showCancel: false, 
-        confirmText: 'OK'
-      });
+    // 2. 时间计算
+    try {
+      const start = new Date(`${date.replace(/-/g, '/')} ${startTime}`);
+      const end = new Date(`${date.replace(/-/g, '/')} ${endTime}`);
+      
+      if (end <= start) {
+        return wx.showModal({
+          title: 'Time Error', 
+          content: 'End time must be after start time', 
+          showCancel: false, 
+          confirmText: 'OK'
+        });
+      }
+      
+      const durationHours = (end - start) / (1000 * 60 * 60);
+
+      // 3. 构造数据对象
+      let plans = wx.getStorageSync('plans') || [];
+      
+      if (isEdit) {
+          // 编辑模式：找到旧数据并替换
+          const index = plans.findIndex(p => p.id == planId);
+          if (index !== -1) {
+              plans[index] = {
+                  ...plans[index], // 保留其他可能存在的字段
+                  title, date, startTime, endTime, 
+                  category: category || 'Uncategorized',
+                  color: selectedColor, icon, 
+                  duration: durationHours.toFixed(1)
+              };
+              wx.showToast({ title: 'Updated!', icon: 'success' });
+          } else {
+              // 极端情况：编辑时找不到原数据，当做新增处理
+              const newPlan = {
+                  id: Date.now(), type: 'plan', title, date, startTime, endTime, 
+                  category: category || 'Uncategorized', color: selectedColor, icon, duration: durationHours.toFixed(1)
+              };
+              plans.push(newPlan);
+          }
+      } else {
+          // 新增模式
+          const newPlan = {
+              id: Date.now(),
+              type: 'plan',
+              title, date, startTime, endTime, 
+              category: category || 'Uncategorized',
+              color: selectedColor, icon, 
+              duration: durationHours.toFixed(1)
+          };
+          plans.push(newPlan);
+          wx.showToast({ title: 'Created!', icon: 'success' });
+      }
+
+      // 4. 保存并返回
+      wx.setStorageSync('plans', plans);
+      setTimeout(() => wx.navigateBack(), 1000);
+
+    } catch (err) {
+      console.error('Save failed:', err);
+      wx.showToast({ title: 'Save Error', icon: 'none' });
     }
-    
-    const durationHours = (end - start) / (1000 * 60 * 60);
-
-    const newPlan = {
-      id: Date.now(),
-      type: 'plan',
-      title, 
-      date, 
-      startTime, 
-      endTime, 
-      category: category || 'Uncategorized',
-      color: selectedColor,
-      icon: icon, 
-      duration: durationHours.toFixed(1)
-    };
-
-    let plans = wx.getStorageSync('plans') || [];
-    plans.push(newPlan);
-    wx.setStorageSync('plans', plans);
-
-    wx.showToast({ title: 'Done!', icon: 'success' });
-    setTimeout(() => wx.navigateBack(), 1000);
   }
 })

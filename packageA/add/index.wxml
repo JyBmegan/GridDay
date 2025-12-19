@@ -3,22 +3,31 @@
 
   <view class="section">
     <view class="label">Habit Name</view>
-    <input class="input-box" placeholder="e.g., Drink water" placeholder-class="ph-style" bindinput="bindNameInput" />
+    <input 
+    class="input-box" 
+    value="{{name}}"
+    placeholder="e.g., Drink water" placeholder-class="ph-style" bindinput="bindNameInput" />
   </view>
 
   <view class="section">
-    <view class="label">Category</view>
-    <view class="category-list">
-      <view 
-        wx:for="{{categoryList}}" wx:key="*this"
-        class="cat-item {{category === item ? 'active' : ''}}"
-        bindtap="selectCategory" data-item="{{item}}"
-        style="{{category === item ? 'background:'+selectedColor+'; border-color:'+selectedColor : ''}}"
-      >
-        {{item}}
-      </view>
-      <view class="cat-item add-btn" bindtap="toggleAddCategory" wx:if="{{!showAddCategory}}">+</view>
+    <!-- <view class="label">Category</view> -->
+    <view class="label-row" style="display: flex; justify-content: space-between; align-items: baseline;">
+      <view class="label">Category</view>
+      <view style="font-size: 12px; color: #999;">(Long press tag to delete)</view>
     </view>
+    <view class="category-list">
+    <view 
+      wx:for="{{categoryList}}" wx:key="*this"
+      class="cat-item {{category === item ? 'active' : ''}}"
+      bindtap="selectCategory" 
+      bindlongpress="deleteCategory" 
+      data-item="{{item}}"
+      style="{{category === item ? 'background:'+selectedColor+'; border-color:'+selectedColor : ''}}"
+    >
+      {{item}}
+      </view>
+    <view class="cat-item add-btn" bindtap="toggleAddCategory" wx:if="{{!showAddCategory}}">+</view>
+  </view>
     
     <view class="add-cat-box" wx:if="{{showAddCategory}}">
       <input class="cat-input" placeholder="New Category Name" focus="{{true}}" bindinput="bindCategoryInput" />

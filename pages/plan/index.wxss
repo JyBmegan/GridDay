@@ -1,10 +1,9 @@
+/* pages/plan/index.wxss */
 .container { padding: 0; background: #FAFBFC; height: 100vh; display: flex; flex-direction: column; }
 
 /* 日历样式 */
 .calendar-header { padding: 10px 24px; display: flex; justify-content: space-between; align-items: center; background: #fff; z-index: 10; }
-
 .month-title { font-size: 20px; font-weight: 800; color: #333; }
-
 .ctrl-btns { display: flex; gap: 12px; align-items: center; }
 .btn { width: 32px; height: 32px; background: #eeeff2; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #666; margin-top: 5px;}
 .add-btn-mini { width: 32px; height: 32px; background: #333; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; font-weight: bold; margin-top: 2px;}
@@ -20,28 +19,16 @@
 .dots-row { display: flex; gap: 2px; margin-top: 3px; }
 .dot { width: 4px; height: 4px; border-radius: 50%; }
 
-/* .stats-bar { margin: 15px 20px 0; background: #fff; padding: 12px 16px; border-radius: 16px; display: flex; gap: 20px; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
-.total-box { display: flex; flex-direction: column; align-items: center; min-width: 50px; border-right: 1px solid #eee; padding-right: 15px; }
-.total-box .num { font-size: 20px; font-weight: 800; color: #333; }
-.total-box .unit { font-size: 10px; color: #999; }
-.dist-box { flex: 1; overflow: hidden; }
-.dist-row { height: 6px; width: 100%; display: flex; border-radius: 3px; overflow: hidden; margin-bottom: 6px; }
-.dist-item { height: 100%; }
-.dist-labels { display: flex; white-space: nowrap; gap: 12px; width: 100%; }
-.label-item { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; color: #666; }
-.label-item .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; } */
-
 .timeline-container { flex: 1; width: 100%;background: #fff; margin-top: 20px; border-radius: 20px 20px 0 0; }
-.timeline-body { position: relative; height: 600px; width: 100%; padding: 20px 0; }
+.timeline-body { position: relative; height: 1250px; /* 增加高度防止底部截断 24*50=1200 + padding */ width: 100%; padding: 20px 0; }
 
-/* ★★★ Grid Alignment Fix ★★★ */
 .time-row { 
-  height: 25px; /* First half hour (total 50px) */
+  height: 25px; 
   display: flex; align-items: flex-start; position: relative; 
   box-sizing: border-box;
 }
 .time-row-half { 
-  height: 25px; /* Second half hour */
+  height: 25px; 
   display: flex; align-items: flex-start; position: relative;
   padding-left: 50px; 
   box-sizing: border-box;
@@ -53,11 +40,47 @@
 
 .plan-block { 
   position: absolute; left: 50px; right: 15px; 
-  border-radius: 6px; overflow: auto; 
+  border-radius: 6px; overflow: hidden; /* 防止内容溢出 */
   font-size: 13px; padding: 6px 8px; 
   display: flex; flex-direction: column; justify-content: flex-start; 
   z-index: 5; box-shadow: 0 3px 6px rgba(0,0,0,0.03); 
   box-sizing: border-box; margin-top: 20px;
+  transition: box-shadow 0.1s;
 }
-.block-title { font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; line-height: 1.2; }
-.block-time { font-size: 10px; opacity: 0.9; margin-top: 2px; }
+
+.plan-block.dragging {
+  box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+  opacity: 0.9;
+}
+
+.block-title { font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; line-height: 1.2; pointer-events: none; }
+.block-time { font-size: 10px; opacity: 0.9; margin-top: 2px; pointer-events: none; }
+
+/* ★★★ 拖拽手柄样式 ★★★ */
+.drag-handle {
+  position: absolute;
+  left: 0; right: 0;
+  height: 15px; 
+  z-index: 10;
+  /* background: rgba(255,0,0,0.2);  */ 
+}
+
+.drag-handle.top {
+  top: 0;
+  cursor: ns-resize;
+}
+
+.drag-handle.top::after {
+  content: ''; position: absolute; top: 3px; left: 50%; transform: translateX(-50%);
+  width: 20px; height: 3px; background: rgba(0,0,0,0.1); border-radius: 2px;
+}
+
+.drag-handle.bottom {
+  bottom: 0;
+  cursor: ns-resize;
+}
+
+.drag-handle.bottom::after {
+  content: ''; position: absolute; bottom: 3px; left: 50%; transform: translateX(-50%);
+  width: 20px; height: 3px; background: rgba(0,0,0,0.1); border-radius: 2px;
+}
