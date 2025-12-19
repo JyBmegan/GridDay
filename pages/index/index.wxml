@@ -37,8 +37,13 @@
             <view class="icon-box" style="background: {{habit.color}}15;"><text>{{habit.icon}}</text></view>
             <text class="habit-name">{{habit.name}}</text>
           </view>
-          <view class="check-btn-wrap" catchtap="checkIn" data-id="{{habit.id}}" style="background: {{habit.count >= habit.goal ? habit.color : '#f1f2f6'}};">
-             <text style="color: {{habit.count >= habit.goal ? 'white' : '#dcdde1'}}; font-weight: bold;">✓</text>
+          <view 
+          class="check-btn-wrap {{habit.count >= habit.goal ? 'is-active' : ''}}" 
+          catchtap="checkIn" 
+          data-id="{{habit.id}}" 
+          style="background: {{habit.count >= habit.goal ? habit.color : '#f1f2f6'}};">
+            <view 
+            class="check-mark" style="border-color: {{habit.count >= habit.goal ? '#fff' : '#dcdde1'}};"></view>
           </view>
         </view>
         <view class="heatmap-container">
