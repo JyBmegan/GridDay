@@ -73,67 +73,63 @@ Page({
   },
 
   onLoad(options) {
+    const cachedCats = wx.getStorageSync('plan_categories') || [];
+
+    if (options.id) {
+       wx.setNavigationBarTitle({ title: 'Edit Plan' });
+       this.setData({ categories: cachedCats });
+       this.loadPlanData(options.id);
+       return; 
+    }
+    
     const now = new Date();
     const dateStr = options.date || `${now.getFullYear()}-${(now.getMonth()+1).toString().padStart(2,'0')}-${now.getDate().toString().padStart(2,'0')}`;
     
     const currentH = now.getHours();
     const currentM = now.getMinutes();
     const formatTime = (h, m) => `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}`;
-    let startTimeStr = formatTime(currentH, currentM);
+    let startTimeStr = options.startTime || formatTime(currentH, currentM);
     
-    let endH = currentH + 1;
-    let endM = currentM;
-    
-    if (endH >= 24) {
-       endH = 23; endM = 59; 
-    }
-    const endTimeStr = formatTime(endH, endM);
-    const cachedCats = wx.getStorageSync('plan_categories') || [];
-
+    let [sh, sm] = startTimeStr.split(':').map(Number);
+    let endTotalMins = sh * 60 + sm + 60; // +60分钟
+    let eh = Math.floor(endTotalMins / 60);
+    let em = endTotalMins % 60;
+    if (eh >= 24) { eh = 23; em = 59; }
+    let endTimeStr = formatTime(eh, em);
     let initData = { 
       date: dateStr,
       startTime: startTimeStr,
       endTime: endTimeStr,
       categories: cachedCats
     };
-    
-    const copiedPlan = wx.getStorageSync('copied_plan_buffer');
 
-    if (options.id) {
-       wx.setNavigationBarTitle({ title: 'Edit Plan' });
-       this.loadPlanData(options.id);
-       this.setData({ categories: cachedCats }); 
-       return;
-    }
+    const copiedPlan = wx.getStorageSync('copied_plan_buffer');
 
     if (copiedPlan) {
       wx.showToast({ title: 'Pasted from clipboard', icon: 'none' });
+
       if (copiedPlan.duration) {
-          const [sh, sm] = startTimeStr.split(':').map(Number);
           const durationMins = Math.round(parseFloat(copiedPlan.duration) * 60);
-      
           let newEndTotalMins = (sh * 60 + sm) + durationMins;
           let neh = Math.floor(newEndTotalMins / 60);
           let nem = newEndTotalMins % 60;
-          
-          if (neh >= 24) { neh = 23; nem = 59; } 
+          if (neh >= 24) { neh = 23; nem = 59; }
           endTimeStr = formatTime(neh, nem);
       }
 
       initData = {
           ...initData,
-          title: copiedPlan.title,          
-          category: copiedPlan.category,     
-          selectedColor: copiedPlan.color,   
-          icon: copiedPlan.icon,            
-          endTime: endTimeStr,              
+          title: copiedPlan.title,
+          category: copiedPlan.category,
+          selectedColor: copiedPlan.color,
+          icon: copiedPlan.icon,
+          endTime: endTimeStr,
           categories: this.ensureCategoryExists(copiedPlan.category, cachedCats)
       };
 
       wx.removeStorageSync('copied_plan_buffer');
     }
-
-  this.setData(initData);
+    this.setData(initData);
   },
 
   loadPlanData(id) {
@@ -150,14 +146,15 @@ Page({
             category: target.category,
             selectedColor: target.color,
             icon: target.icon,
-            categories: this.ensureCategoryExists(target.category)
+            categories: this.ensureCategoryExists(target.category, this.data.categories)
         });
     }
   },
 
   ensureCategoryExists(cat, list) {
     if (cat && !list.includes(cat)) {
-      list.push(cat);
+      const newList = [...list, cat];
+      return newList;
     }
     return list;
   },
@@ -167,8 +164,6 @@ Page({
   bindStartTimeChange(e) { this.setData({ startTime: e.detail.value }); },
   bindEndTimeChange(e) { this.setData({ endTime: e.detail.value }); },
 
-  
-  // 选择分类 -> 自动应用该分类绑定的颜色/图标
   selectCategory(e) {
     const cat = e.currentTarget.dataset.cat;
     const settings = wx.getStorageSync('plan_cat_settings') || {}; 
@@ -216,7 +211,6 @@ Page({
 
   deleteCategory(e) {
     const targetCat = e.currentTarget.dataset.cat;
-    // Optional: Confirm dialog
     wx.showModal({
       title: 'Delete Category',
       content: `Remove "${targetCat}"?`,
@@ -265,10 +259,13 @@ Page({
   },
 
   savePlan() {
+    console.log('Save button clicked'); // 调试：看控制台有没有这句话
     const { title, date, startTime, endTime, category, selectedColor, icon, isEdit, planId } = this.data;
     
+    // 1. 校验
     if (!title) return wx.showToast({ title: 'Please enter a title', icon: 'none' });
     
+    // 2. 时间计算
     try {
       const start = new Date(`${date.replace(/-/g, '/')} ${startTime}`);
       const end = new Date(`${date.replace(/-/g, '/')} ${endTime}`);
@@ -284,20 +281,28 @@ Page({
       
       const durationHours = (end - start) / (1000 * 60 * 60);
 
+      // 3. 构造数据对象
       let plans = wx.getStorageSync('plans') || [];
       
       if (isEdit) {
-          // 编辑模式：替换旧数据
+          // 编辑模式：找到旧数据并替换
           const index = plans.findIndex(p => p.id == planId);
           if (index !== -1) {
               plans[index] = {
-                  ...plans[index],
+                  ...plans[index], // 保留其他可能存在的字段
                   title, date, startTime, endTime, 
                   category: category || 'Uncategorized',
                   color: selectedColor, icon, 
                   duration: durationHours.toFixed(1)
               };
               wx.showToast({ title: 'Updated!', icon: 'success' });
+          } else {
+              // 极端情况：编辑时找不到原数据，当做新增处理
+              const newPlan = {
+                  id: Date.now(), type: 'plan', title, date, startTime, endTime, 
+                  category: category || 'Uncategorized', color: selectedColor, icon, duration: durationHours.toFixed(1)
+              };
+              plans.push(newPlan);
           }
       } else {
           // 新增模式
@@ -313,6 +318,7 @@ Page({
           wx.showToast({ title: 'Created!', icon: 'success' });
       }
 
+      // 4. 保存并返回
       wx.setStorageSync('plans', plans);
       setTimeout(() => wx.navigateBack(), 1000);
 
