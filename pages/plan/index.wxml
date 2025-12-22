@@ -43,12 +43,14 @@
       </block>
 
       <block wx:for="{{timelinePlans}}" wx:key="id">
-        <view class="plan-block {{isDragging && dragTargetId === item.id ? 'dragging' : ''}}" 
+        <view class="plan-block {{activePlanId === item.id ? 'active-mode' : ''}} {{isDragging && dragTargetId === item.id ? 'dragging' : ''}}" 
               style="{{item.style}}" 
-              catchtap="showPlanAction" 
+              catchtap="handlePlanTap" 
+              catchlongpress="handlePlanLongPress"
               data-id="{{item.id}}">
-              
-          <view class="drag-handle top" 
+          
+          <view wx:if="{{activePlanId === item.id}}"
+                class="drag-handle top" 
                 catchtouchstart="onDragStart" 
                 catchtouchmove="onDragMove" 
                 catchtouchend="onDragEnd"
@@ -62,7 +64,8 @@
             <view class="block-time">{{item.startTime}} - {{item.endTime}}</view>
           </view>
 
-          <view class="drag-handle bottom" 
+          <view wx:if="{{activePlanId === item.id}}"
+                class="drag-handle bottom" 
                 catchtouchstart="onDragStart" 
                 catchtouchmove="onDragMove" 
                 catchtouchend="onDragEnd" 

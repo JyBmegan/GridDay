@@ -8,7 +8,7 @@ Page({
     currentHabit: null,
     currentTime: '',
     note: '',
-    showDropdown: false
+    showDropdown: false,
   },
 
   onShow() {

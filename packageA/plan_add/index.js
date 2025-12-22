@@ -3,10 +3,13 @@ Page({
     isEdit: false,
     planId: null,
     title: '',
+    historyTitles: [],
+    suggestionList: [],
     category: '', 
     categories: [], 
     customCategory: '',
     showAddCategory: false,
+    showSuggestions: false,
     // 备选颜色和图标
     colors: [
       /* Row 1: Red/Pink (Deep -> Light) */
@@ -83,12 +86,14 @@ Page({
     }
     
     const now = new Date();
+    let startTimeStr = options.startTime || `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+
     const dateStr = options.date || `${now.getFullYear()}-${(now.getMonth()+1).toString().padStart(2,'0')}-${now.getDate().toString().padStart(2,'0')}`;
     
     const currentH = now.getHours();
     const currentM = now.getMinutes();
     const formatTime = (h, m) => `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}`;
-    let startTimeStr = options.startTime || formatTime(currentH, currentM);
+
     
     let [sh, sm] = startTimeStr.split(':').map(Number);
     let endTotalMins = sh * 60 + sm + 60; // +60分钟
@@ -130,6 +135,9 @@ Page({
       wx.removeStorageSync('copied_plan_buffer');
     }
     this.setData(initData);
+
+    const history = wx.getStorageSync('plan_title_history') || [];
+    this.setData({ historyTitles: history });
   },
 
   loadPlanData(id) {
@@ -159,7 +167,49 @@ Page({
     return list;
   },
 
-  bindTitle(e) { this.setData({ title: e.detail.value }); },
+  bindTitle(e) {
+    const val = e.detail.value;
+    this.setData({ title: val });
+    if (!val) {
+      this.setData({ showSuggestions: false });
+      return;
+    }
+    const matches = this.data.historyTitles.filter(t => 
+      t.toLowerCase().includes(val.toLowerCase()) && t !== val
+    );
+    this.setData({
+      suggestionList: matches.slice(0, 5), 
+      showSuggestions: matches.length > 0
+    });
+  },
+
+  selectSuggestion(e) {
+    const val = e.currentTarget.dataset.val;
+    let updateData = {
+      title: val,
+      showSuggestions: false
+    };
+
+    const allPlans = wx.getStorageSync('plans') || [];
+
+    const match = allPlans.slice().reverse().find(p => p.title === val);
+
+    if (match) {
+      updateData.category = match.category;
+      updateData.selectedColor = match.color;
+      updateData.icon = match.icon;
+      const currentCats = this.data.categories;
+      if (match.category && !currentCats.includes(match.category)) {
+         updateData.categories = [...currentCats, match.category];
+      }
+    }
+    this.setData(updateData);
+  },
+
+  closeSuggestions() {
+    this.setData({ showSuggestions: false });
+  },
+  
   bindDateChange(e) { this.setData({ date: e.detail.value }); },
   bindStartTimeChange(e) { this.setData({ startTime: e.detail.value }); },
   bindEndTimeChange(e) { this.setData({ endTime: e.detail.value }); },
@@ -259,13 +309,17 @@ Page({
   },
 
   savePlan() {
-    console.log('Save button clicked'); // 调试：看控制台有没有这句话
     const { title, date, startTime, endTime, category, selectedColor, icon, isEdit, planId } = this.data;
     
-    // 1. 校验
     if (!title) return wx.showToast({ title: 'Please enter a title', icon: 'none' });
+
+    let history = wx.getStorageSync('plan_title_history') || [];
+    if (!history.includes(title)) {
+      history.unshift(title); 
+      if (history.length > 50) history.pop();
+      wx.setStorageSync('plan_title_history', history);
+    }
     
-    // 2. 时间计算
     try {
       const start = new Date(`${date.replace(/-/g, '/')} ${startTime}`);
       const end = new Date(`${date.replace(/-/g, '/')} ${endTime}`);
@@ -281,11 +335,16 @@ Page({
       
       const durationHours = (end - start) / (1000 * 60 * 60);
 
-      // 3. 构造数据对象
       let plans = wx.getStorageSync('plans') || [];
+
+      const planData = {
+        title, date, startTime, endTime, 
+        category: category || 'Uncategorized',
+        color: selectedColor, icon, 
+        duration: durationHours.toFixed(1)
+      };
       
       if (isEdit) {
-          // 编辑模式：找到旧数据并替换
           const index = plans.findIndex(p => p.id == planId);
           if (index !== -1) {
               plans[index] = {
@@ -305,7 +364,6 @@ Page({
               plans.push(newPlan);
           }
       } else {
-          // 新增模式
           const newPlan = {
               id: Date.now(),
               type: 'plan',
@@ -317,8 +375,6 @@ Page({
           plans.push(newPlan);
           wx.showToast({ title: 'Created!', icon: 'success' });
       }
-
-      // 4. 保存并返回
       wx.setStorageSync('plans', plans);
       setTimeout(() => wx.navigateBack(), 1000);
 

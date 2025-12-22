@@ -10,30 +10,28 @@ Page({
     timelinePlans: [],
     totalHours: 0,
     categoryStats: [],
+    
+    // 拖拽相关
     isDragging: false,
     dragTargetId: null,
     dragType: '',
     dragStartY: 0,
     initialTop: 0,
-    initialHeight: 0
+    initialHeight: 0,
+    
+    // ★★★ 交互状态 ★★★
+    activePlanId: null, // 当前哪个块处于“被激活/可调整”状态
+    lastTapTime: 0,     // 用于计算双击
   },
 
   onShow() {
     const today = new Date();
     const dateStr = this.data.selectedDate || this.formatDate(today);
-    
-    // const allPlans = wx.getStorageSync('plans') || [];
-    // console.log('【Plan页面】读取缓存总数:', allPlans.length);
-    // console.log('【Plan页面】当前选中日期:', dateStr);
-    
     this.initCalendar(new Date(dateStr));
     this.generateTimeSlots();
-
-    // if (this.data.selectedDate) {
-    //   this.loadTimeline(this.data.selectedDate);
-    // }
   },
 
+  // ... (normalizeDate, initCalendar, generateCalendarGrid, selectDay 保持不变) ...
   normalizeDate(dateInput) {
     if (!dateInput) return '';
     const dateObj = new Date(dateInput.toString().replace(/-/g, '/'));
@@ -67,7 +65,6 @@ Page({
     for (let i = 1; i <= daysInMonth; i++) {
       const dStr = `${year}-${month.toString().padStart(2,'0')}-${i.toString().padStart(2,'0')}`;
       const dayPlans = allPlans.filter(p => this.normalizeDate(p.date) === dStr);
-      // 提取颜色点
       const dots = [...new Set(dayPlans.map(p => p.color))].slice(0, 3);
       days.push({ day: i, fullDate: dStr, dots });
     }
@@ -85,7 +82,7 @@ Page({
     const allPlans = wx.getStorageSync('plans') || [];
     const targetDate = this.normalizeDate(dateStr);
     const todayPlans = allPlans.filter(p => this.normalizeDate(p.date) === targetDate);
-    // console.log(`【Plan页面】日期 ${targetDate} 匹配到计划数:`, todayPlans.length);
+    
     let total = 0;
     const catMap = {};
     
@@ -110,8 +107,8 @@ Page({
       return {
         ...p,
         color, top, height,
-        // box-sizing 避免边框导致高度计算误差
-        style: `top: ${top}px; height: ${height}px; background: ${color}40; border-left: 3px solid ${color}; color: ${color}; box-sizing: border-box;z-index: ${this.data.dragTargetId === p.id ? 10 : 5};`
+        // 注意 z-index: 如果是被拖拽的或者是被激活的，层级要高
+        style: `top: ${top}px; height: ${height}px; background: ${color}40; border-left: 3px solid ${color}; color: ${color}; box-sizing: border-box; z-index: ${this.data.dragTargetId === p.id || this.data.activePlanId === p.id ? 10 : 5};`
       };
     }).filter(p => p !== null); 
 
@@ -122,8 +119,36 @@ Page({
     });
   },
 
-  showPlanAction(e) {
+  // ★★★ 新增：处理点击事件 (判断单击 vs 双击) ★★★
+  handlePlanTap(e) {
     const id = e.currentTarget.dataset.id;
+    const now = Date.now();
+    const lastTap = this.data.lastTapTime;
+
+    // 如果两次点击间隔小于 300ms -> 视为双击
+    if (now - lastTap < 300) {
+      // 双击：激活拖拽模式 (UI上显示手柄)
+      this.setData({ activePlanId: id });
+      wx.vibrateShort({ type: 'light' });
+    } else {
+      // 单击：如果点的不是当前激活的，就取消激活
+      if (this.data.activePlanId !== id) {
+          // 这里可以选择清空 activePlanId，也可以不做操作
+          // 建议：点击别的项目时，不做任何事，或者只做高亮
+      }
+    }
+    // 更新最后点击时间
+    this.setData({ lastTapTime: now });
+  },
+
+  // ★★★ 新增：处理长按事件 (弹出菜单) ★★★
+  handlePlanLongPress(e) {
+    const id = e.currentTarget.dataset.id;
+    
+    // 长按时也激活选中状态，视觉反馈更好
+    this.setData({ activePlanId: id });
+    wx.vibrateShort({ type: 'medium' });
+
     wx.showActionSheet({
         itemList: ['Edit', 'Copy', 'Delete'], 
         success: (res) => {
@@ -138,26 +163,36 @@ Page({
     });
   },
 
+  // 复制功能
   copyPlan(id) {
     let plans = wx.getStorageSync('plans') || [];
     const target = plans.find(p => p.id === id);
     if (!target) return;
     wx.setStorageSync('copied_plan_buffer', target);
     wx.vibrateShort({ type: 'medium' });
-    wx.showToast({ title: 'Copied!', icon: 'none', duration: 2000 });
+    wx.showToast({ title: 'Copied! Tap time slot to paste', icon: 'none', duration: 2000 });
   },
   
+  // ★★★ 修改：点击空白时间槽 (粘贴 或 取消选中) ★★★
   onPasteTimeSlot(e) {
+    // 1. 优先逻辑：如果当前有激活的拖拽块，点击空白处 = 取消激活
+    if (this.data.activePlanId !== null) {
+      this.setData({ activePlanId: null });
+      return; // 结束，不执行粘贴
+    }
+
     const timeStr = e.currentTarget.dataset.time;
     if (!timeStr) return;
 
     const copiedPlan = wx.getStorageSync('copied_plan_buffer');
 
+    // 2. 如果没有复制数据，跳转新建
     if (!copiedPlan) {
       wx.navigateTo({ url: `/packageA/plan_add/index?date=${this.data.selectedDate}&startTime=${timeStr}` });
       return;
     }
 
+    // 3. 执行粘贴逻辑
     const [sh, sm] = timeStr.split(':').map(Number);
     const startMins = sh * 60 + sm;
     
@@ -184,11 +219,12 @@ Page({
 
     this.loadTimeline(this.data.selectedDate);
     
-    wx.removeStorageSync('copied_plan_buffer'); 
+    // wx.removeStorageSync('copied_plan_buffer'); // 注释掉这行可以实现连续粘贴
     wx.vibrateShort({ type: 'heavy' });
     wx.showToast({ title: 'Pasted!', icon: 'success' });
   },
 
+  // 拖拽逻辑保持不变 (但请确保 WXML 里绑定了 activePlanId 判断)
   onDragStart(e) {
     const { id, type } = e.currentTarget.dataset;
     const touch = e.touches[0];
@@ -210,7 +246,7 @@ Page({
     const touch = e.touches[0];
 
     const rawDeltaY = touch.pageY - this.data.dragStartY;
-    const SNAP_STEP = 25; 
+    const SNAP_STEP = 25; // 30分钟吸附
 
     const { dragType, initialTop, initialHeight, dragTargetId } = this.data;
 
@@ -239,7 +275,7 @@ Page({
       if (dragType === 'top') snappedHeight = initialTop + initialHeight; 
     }
 
-    const MAX_HEIGHT = 24 * 50; // HOUR_HEIGHT = 50
+    const MAX_HEIGHT = 24 * 50; 
     if (snappedTop + snappedHeight > MAX_HEIGHT) {
       snappedHeight = MAX_HEIGHT - snappedTop;
     }
@@ -299,12 +335,11 @@ Page({
     if (index !== -1) {
       plans[index].startTime = start;
       plans[index].endTime = end;
-      // 重新计算时长字符串用于显示
       const [sh, sm] = start.split(':').map(Number);
       const [eh, em] = end.split(':').map(Number);
       plans[index].duration = ((eh*60+em - (sh*60+sm)) / 60).toFixed(1);
       wx.setStorageSync('plans', plans);
-      wx.vibrateShort({ type: 'light' }); // 震动反馈
+      wx.vibrateShort({ type: 'light' }); 
     }
   },
 

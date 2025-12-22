@@ -1,15 +1,26 @@
 <view class="container">
   <view class="page-title">{{isEdit ? 'Edit Plan' : 'New Plan'}}</view>
 
-  <view class="input-group">
+  <view class="input-group" style="position: relative; z-index: 100;">
     <input 
       class="main-input" 
       value="{{title}}" 
       placeholder="What needs to be done?" 
       placeholder-class="ph" 
       bindinput="bindTitle" 
+      bindblur="closeSuggestions" 
       auto-focus 
     />
+    
+    <view class="suggestion-box" wx:if="{{showSuggestions}}">
+      <view class="suggestion-item" 
+            wx:for="{{suggestionList}}" 
+            wx:key="*this" 
+            bindtap="selectSuggestion" 
+            data-val="{{item}}">
+        {{item}}
+      </view>
+    </view>
   </view>
 
   <view class="section-title" style="display: flex; justify-content: space-between; align-items: center;">
