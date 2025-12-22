@@ -144,7 +144,7 @@ Page({
     if (!target) return;
     wx.setStorageSync('copied_plan_buffer', target);
     wx.vibrateShort({ type: 'medium' });
-    wx.showToast({ title: 'Copied! Tap + to paste', icon: 'none', duration: 2000 });
+    wx.showToast({ title: 'Copied!', icon: 'none', duration: 2000 });
   },
   
   onPasteTimeSlot(e) {
