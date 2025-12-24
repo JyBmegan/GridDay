@@ -297,3 +297,16 @@
 }
 
 /* ★★★ 新增：定义数字样式 ★★★ */
+/* 子标题样式 (Part A / Part B) */
+.sub-header {
+  margin-bottom: 16px;
+  padding-left: 4px;
+}
+
+.sub-header-text {
+  font-size: 14px;
+  font-weight: 800;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}

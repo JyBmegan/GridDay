@@ -1,7 +1,20 @@
 <view class="container">
-  
-  <view class="calendar-header">
-    <view class="month-title">{{monthStr}}</view>
+
+  <view class="header-row" style="display: flex; justify-content: space-between; align-items: flex-start; padding: 10px 24px 0;">
+    <view class="header-left">
+      <view style="display: flex; align-items: center;">
+        <view class="title" style="font-size: 24px; font-weight: 800; color: #333;">My Day</view>
+        <view class="ghost-help-btn" bindtap="goToHelp">
+           <text class="ghost-help-text">ⓘ</text>
+        </view>
+      </view>
+      <view class="subtitle" style="font-size: 13px; color: #999; margin-top: 4px;">Make every hour planned and recorded</view>
+    </view>
+    
+    </view>
+
+  <view class="calendar-header" style="padding-top: 15px;"> <view class="month-title" style="font-size: 20px;">{{monthStr}}</view>
+    
     <view class="ctrl-btns">
       <view class="btn" bindtap="prevMonth">‹</view>
       <view class="btn" bindtap="nextMonth">›</view>
@@ -27,7 +40,7 @@
   </view>
 
   <scroll-view scroll-y class="timeline-container" scroll-top="400">
-    <view class="timeline-body">
+    <view class="timeline-body {{activePlanId ? 'dim-mode' : ''}}">
       
       <block wx:for="{{timeSlots}}" wx:key="index">
         

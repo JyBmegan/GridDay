@@ -206,6 +206,27 @@ Page({
     this.setData(updateData);
   },
 
+  deleteHistoryItem(e) {
+    const val = e.currentTarget.dataset.val;
+    
+    let newHistory = this.data.historyTitles.filter(t => t !== val);
+    
+    wx.setStorageSync('plan_title_history', newHistory);
+    
+    const currentInput = this.data.title;
+    const newMatches = newHistory.filter(t => 
+      t.toLowerCase().includes(currentInput.toLowerCase()) && t !== currentInput
+    );
+
+    this.setData({
+      historyTitles: newHistory,
+      suggestionList: newMatches,
+      showSuggestions: newMatches.length > 0
+    });
+    
+    wx.vibrateShort({ type: 'light' });
+  },
+
   closeSuggestions() {
     this.setData({ showSuggestions: false });
   },

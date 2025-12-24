@@ -1,8 +1,16 @@
 <view class="container" bindtap="closeDropdown">
   
-  <view class="header-row">
+  <view class="header-row" style="display: flex; justify-content: space-between; align-items: flex-start; padding-top: 10px;">
+    
     <view class="header-left">
-      <view class="title-date">Habit Tracker</view>
+      <view class="title-row" style="display: flex; align-items: center;">
+        <view class="title-date">Habit Tracker</view>
+        
+        <view class="ghost-help-btn" bindtap="goToHelp">
+          <text class="ghost-help-text">ⓘ</text> 
+          </view>
+      </view>
+      
       <view class="subtitle">Focus on your day</view>
     </view>
 
@@ -10,7 +18,9 @@
       <text class="filter-text">{{currentCategory}}</text>
       <view class="arrow-icon {{showDropdown ? 'up' : ''}}">▼</view>
     </view>
-  </view>
+
+</view>
+
 
   <view class="dropdown-menu {{showDropdown ? 'show' : ''}}" catchtap="stopProp">
     <view 

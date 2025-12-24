@@ -2,7 +2,7 @@
 .container { padding: 0; background: #FAFBFC; height: 100vh; display: flex; flex-direction: column; }
 
 /* 日历样式 */
-.calendar-header { padding: 10px 24px; display: flex; justify-content: space-between; align-items: center; background: #fff; z-index: 10; }
+.calendar-header {padding: 10px 24px; display: flex; justify-content: space-between; align-items: center; background: #fff; z-index: 10; }
 .month-title { font-size: 20px; font-weight: 800; color: #333; }
 .ctrl-btns { display: flex; gap: 12px; align-items: center; }
 .btn { width: 32px; height: 32px; background: #eeeff2; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #666; margin-top: 5px;}
@@ -83,4 +83,23 @@
 .drag-handle.bottom::after {
   content: ''; position: absolute; bottom: 3px; left: 50%; transform: translateX(-50%);
   width: 20px; height: 3px; background: rgba(0,0,0,0.1); border-radius: 2px;
+}
+
+/* 专注模式 (Dim Mode)*/
+.timeline-body.dim-mode .plan-block {
+  opacity: 0.3;
+  filter: grayscale(100%);
+  transition: all 0.3s;
+}
+
+.timeline-body.dim-mode .time-row,
+.timeline-body.dim-mode .time-row-half {
+  opacity: 0.4;
+}
+
+.timeline-body.dim-mode .plan-block.active-mode {
+  opacity: 1;
+  filter: none;
+  z-index: 99 !important; 
+  box-shadow: 0 8px 30px rgba(0,0,0,0.25); 
 }

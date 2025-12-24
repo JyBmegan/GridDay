@@ -10,11 +10,11 @@
       "pages": [
         "add/index",
         "detail/index",
-        "plan_add/index"
+        "plan_add/index",
+        "help/index"
       ]
     }
   ],
-
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#FAFBFC",
@@ -30,20 +30,20 @@
       {
         "pagePath": "pages/index/index",
         "text": "Tracker",
-        "iconPath": "images/tab_home.png",
-        "selectedIconPath": "images/tab_home_active.png"
+        "iconPath": "packageA/images/tab_home.png",
+        "selectedIconPath": "packageA/images/tab_home_active.png"
       },
       {
         "pagePath": "pages/stats/index",
         "text": "Stats",
-        "iconPath": "images/tab_stats.png",
-        "selectedIconPath": "images/tab_stats_active.png"
+        "iconPath": "packageA/images/tab_stats.png",
+        "selectedIconPath": "packageA/images/tab_stats_active.png"
       },
       {
         "pagePath": "pages/plan/index",
         "text": "Schedule",
-        "iconPath": "images/tab_plan.png",
-        "selectedIconPath": "images/tab_plan_active.png"
+        "iconPath": "packageA/images/tab_plan.png",
+        "selectedIconPath": "packageA/images/tab_plan_active.png"
       }
     ]
   },

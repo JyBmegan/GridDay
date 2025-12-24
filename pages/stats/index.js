@@ -37,6 +37,10 @@ Page({
 
   chartInstances: {},
 
+  goToHelp() {
+    wx.navigateTo({ url: '/packageA/help/index' });
+  },
+
   onShow() {
     this.updateDateRangeStr();
     if(this.data.statType === 'plan') this.autoJumpToData();

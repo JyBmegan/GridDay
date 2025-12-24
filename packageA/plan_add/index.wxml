@@ -15,10 +15,13 @@
     <view class="suggestion-box" wx:if="{{showSuggestions}}">
       <view class="suggestion-item" 
             wx:for="{{suggestionList}}" 
-            wx:key="*this" 
-            bindtap="selectSuggestion" 
-            data-val="{{item}}">
-        {{item}}
+            wx:key="*this">
+        <view class="suggestion-text" bindtap="selectSuggestion" data-val="{{item}}">
+          {{item}}
+        </view>
+        <view class="suggestion-del" catchtap="deleteHistoryItem" data-val="{{item}}">
+          ✕
+        </view>
       </view>
     </view>
   </view>

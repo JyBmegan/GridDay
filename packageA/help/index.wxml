@@ -1,0 +1,98 @@
+<view class="container page-bg">
+  
+  <view class="header-section">
+    <view class="main-title">User Guide</view>
+    <view class="sub-title">Master your day with simple gesture</view>
+  </view>
+
+  <view class="module-header">
+    <view class="module-icon" style="background: #cde7f3; color: #0e1318;">✔️</view>
+    <text>Habit Actions</text>
+  </view>
+  
+  <view class="card feature-card">
+    <view class="feature-block">
+      <view class="feature-title">One-Tap Check-in</view>
+      <view class="feature-desc"><text style="font-weight: 600; color:rgb(26, 156, 216);">Simply tap </text> the habit card to mark it as done for the day.</view>
+      <image class="feature-media shadow" src="/packageA/images/habit_checkin.gif" mode="widthFix"></image>
+    </view>
+    <view class="divider"></view>
+    <view class="feature-block">
+      <view class="feature-title">Actions Menu</view>
+      <view class="feature-desc"><text style="font-weight: 600; color:rgb(26, 156, 216);">Long-press </text> any card to reveal the menu: Detail, Edit, or Delete.</view>
+      <image class="feature-media shadow" src="/packageA/images/habit_menu.gif" mode="widthFix"></image>
+    </view>
+  </view>
+
+
+  <view class="module-header" style="margin-top: 40px;">
+    <view class="module-icon" style="background: #fff3d9; color: #fa8c16;">📅</view>
+    <text>Timeline Actions</text>
+  </view>
+  
+  <view class="card feature-card">
+    <view class="feature-block highlight-block">
+      <view class="feature-title">Resize Plan</view>
+      <view class="feature-desc">
+        <text style="font-weight: 600; color:#fa8c16;">Double-tap </text> to enter Focus Mode. Drag handles to resize.
+      </view>
+      <image class="feature-media shadow-lg" src="/packageA/images/plan_focus_mode.gif" mode="widthFix"></image>
+    </view>
+
+    <view class="divider"></view>
+
+    <view class="feature-block">
+      <view class="feature-title">Smart Copy & Paste</view>
+      <view class="feature-desc">Copy a task, then <text style="font-weight: 600; color:#fa8c16;"> tap any empty slot </text> to paste instantly.</view>
+      <image class="feature-media shadow" src="/packageA/images/plan_paste.gif" mode="widthFix"></image>
+    </view>
+  </view>
+
+
+  <view class="module-header" style="margin-top: 40px;">
+    <view class="module-icon" style="background: #e2fdc7; color: #6fec31;">📊</view>
+    <text>Data Analytics</text>
+  </view>
+
+  <view class="card feature-card">
+    <view class="feature-block">
+      <view class="feature-title">Visual Trends</view>
+      <view class="feature-desc">In <text style="font-weight:600; color: #7cc731"> Trend </text> mode, switch between <text style="font-weight:600; color: #7cc731"> Week</text>, <text style="font-weight:600; color: #7cc731"> Month</text>, and <text style="font-weight:600; color: #7cc731"> Year </text> views.</view>
+      <image class="feature-media shadow" src="/packageA/images/stats_habit_trend.png" mode="widthFix"></image>
+    </view>
+    <view class="divider"></view>
+    <view class="feature-block">
+      <view class="feature-title">Completion Curve</view>
+      <view class="feature-desc">Switch to <text style="font-weight:600; color: #7cc731"> Hours </text> mode to see cumulative progress.</view>
+      <image class="feature-media shadow" src="/packageA/images/stats_habit_time.png" mode="widthFix"></image>
+    </view>
+
+    <view class="divider"></view>
+    <view class="feature-block">
+      <view class="feature-title">Intensity Map</view>
+      <view class="feature-desc">Heatmap visualizes your schedule density.</view>
+      <image class="feature-media shadow" src="/packageA/images/stats_heatmap.png" mode="widthFix"></image>
+    </view>
+    <view class="divider"></view>
+    <view class="feature-block">
+      <view class="feature-title">Trend Bar</view>
+      <view class="feature-desc">Compare total task duration across time.</view>
+      <image class="feature-media shadow" src="/packageA/images/stats_trend.png" mode="widthFix"></image>
+    </view>
+    <view class="divider"></view>
+    <view class="feature-block">
+      <view class="feature-title">Distribution</view>
+      <view class="feature-desc">Breakdown of time usage by category.</view>
+      <image class="feature-media shadow" src="/packageA/images/stats_pie.png" mode="widthFix"></image>
+    </view>
+    <view class="divider"></view>
+    <view class="feature-block">
+      <view class="feature-title">Hourly Focus</view>
+      <view class="feature-desc">Peak productivity hours.</view>
+      <image class="feature-media shadow" src="/packageA/images/stats_line.png" mode="widthFix"></image>
+    </view>
+  </view>
+
+  <view class="footer">Made for your better self.</view>
+  <view style="height: 40px;"></view>
+</view>

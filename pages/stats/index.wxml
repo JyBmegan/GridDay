@@ -1,4 +1,4 @@
-<view class="container" bindtap="closeDropdown">
+<view class="container">
   
   <view class="type-switch-header">
     <view class="type-btn {{statType === 'habit' ? 'active' : ''}}" bindtap="switchStatType" data-type="habit">Habits</view>
@@ -6,16 +6,30 @@
   </view>
 
   <block wx:if="{{statType === 'habit'}}">
-    <view class="header-row">
-        <view class="header-left"><view class="title">Habit Data</view><view class="subtitle">Keep streak going</view></view>
-        <view class="filter-trigger" catchtap="toggleDropdown" wx:if="{{categories.length > 0}}"><text class="filter-text">{{currentCategory}}</text><view class="arrow-icon">▼</view></view>
+    
+    <view class="header-row" style="display: flex; justify-content: space-between; align-items: flex-start; padding: 10px 20px;">
+        <view class="header-left">
+            <view style="display: flex; align-items: center;">
+                <view class="title" style="font-size: 24px; font-weight: 800; color: #333;">Tracker Analytics</view>
+                <view class="ghost-help-btn" bindtap="goToHelp">
+                    <text class="ghost-help-text">ⓘ</text>
+                </view>
+            </view>
+            <view class="subtitle" style="font-size: 13px; color: #999; margin-top: 4px;">Review your habit cultivation</view>
+        </view>
+
+        <view class="filter-trigger" catchtap="toggleDropdown" wx:if="{{categories.length > 0}}">
+            <text class="filter-text">{{currentCategory}}</text>
+            <view class="arrow-icon">▼</view>
+        </view>
     </view>
-<view class="dropdown-menu {{showDropdown ? 'show' : ''}}" catchtap="stopProp">
-    <view class="dropdown-item" bindtap="switchCategory" data-cat="All">All</view>
-    <block wx:for="{{categories}}" wx:key="*this">
-        <view class="dropdown-item" bindtap="switchCategory" data-cat="{{item}}">{{item}}</view>
-    </block>
-</view>
+
+    <view class="dropdown-menu {{showDropdown ? 'show' : ''}}" catchtap="stopProp">
+        <view class="dropdown-item" bindtap="switchCategory" data-cat="All">All</view>
+        <block wx:for="{{categories}}" wx:key="*this">
+            <view class="dropdown-item" bindtap="switchCategory" data-cat="{{item}}">{{item}}</view>
+        </block>
+    </view>
 
     <view class="mode-switch-container">
         <view class="mode-switch-box">
@@ -42,7 +56,7 @@
                         <view class="name">{{habit.name}}</view>
                         <view class="count-text" style="color: '#5d5d5d'">
                             {{displayMode==='trend' ? (currentView==='week'?habit.weekTotal:habit.monthTotal) : habit.totalCount}} 
-                            <text class="unit-text">times</text>
+                            <text class="unit-text"> times</text>
                         </view>
                     </view>
                 </view>
@@ -89,21 +103,36 @@
     </scroll-view>
   </block>
 
+
   <block wx:if="{{statType === 'plan'}}">
+    
+    <view class="header-row" style="display: flex; justify-content: space-between; align-items: flex-start; padding: 10px 20px;">
+        <view class="header-left">
+            <view style="display: flex; align-items: center;">
+                <view class="title" style="font-size: 24px; font-weight: 800; color: #333;">Schedules Analytics</view>
+                <view class="ghost-help-btn" bindtap="goToHelp">
+                    <text class="ghost-help-text">ⓘ</text>
+                </view>
+            </view>
+            <view class="subtitle" style="font-size: 13px; color: #999; margin-top: 4px;">Review your efficiency</view>
+        </view>
+    </view>
+
     <view class="header-row">
        <view class="range-nav-bar compact">
           <view class="nav-btn" bindtap="prevRange">‹</view>
           <view class="nav-text">{{dateRangeStr}}</view>
           <view class="nav-btn" bindtap="nextRange">›</view>
        </view>
+       
        <view class="filter-trigger" catchtap="togglePlanDropdown">
            <text class="filter-text">{{currentPlanCategory}}</text>
            <view class="arrow-icon">▼</view>
        </view>
     </view>
-  <view class="dropdown-menu {{showPlanDropdown ? 'show' : ''}}" catchtap="stopProp">
+
+    <view class="dropdown-menu {{showPlanDropdown ? 'show' : ''}}" catchtap="stopProp">
         <view class="dropdown-item" bindtap="switchPlanCategory" data-cat="All">All</view>
-        
         <block wx:for="{{planFilterCats}}" wx:key="*this">
            <view class="dropdown-item" bindtap="switchPlanCategory" data-cat="{{item}}">{{item}}</view>
         </block>
@@ -120,7 +149,6 @@
     <scroll-view scroll-y class="grid-scroll">
        <view class="stat-card">
           <view class="card-header"><view class="name-box"><view class="name">Intensity Map</view></view></view>
-          
           <scroll-view scroll-x class="year-scroll-box" wx:if="{{isYearView}}" enable-flex="true">
              <view class="heatmap-grid-year-gh">
                 <block wx:for="{{heatmapGrid}}" wx:key="index">
@@ -128,7 +156,6 @@
                 </block>
              </view>
           </scroll-view>
-
           <view class="intensity-row" wx:else>
              <view class="intensity-chart">
                 <view class="heatmap-grid-normal">
@@ -190,6 +217,7 @@
              <view class="data-item"><text class="d-label">{{footerData.curve.label2}}</text><text class="d-val">{{footerData.curve.val2}}</text></view>
           </view>
        </view>
+       
        <view style="height: 40px;"></view>
     </scroll-view>
   </block>

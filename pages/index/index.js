@@ -11,6 +11,10 @@ Page({
     showDropdown: false,
   },
 
+  goToHelp() {
+    wx.navigateTo({ url: '/packageA/help/index' });
+  },
+
   onShow() {
     this.loadHabits();
   },
