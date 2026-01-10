@@ -139,19 +139,44 @@ Page({
   },
 
   saveHabit() {
-    const { name, icon, selectedColor, goal, category } = this.data;
+    const { name, icon, selectedColor, goal, category, isEdit, habitId } = this.data;
     if (!name) return wx.showToast({ title: 'Please Name the Habit', icon: 'none' });
     if (!icon) return wx.showToast({ title: 'Please Select a Icon', icon: 'none' });
 
     let habits = wx.getStorageSync('habits') || [];
-    const newHabit = {
-      id: Date.now(),
-      name, icon, color: selectedColor, goal, category,
-      logs: []
-    };
-    habits.push(newHabit);
+    
+    if (isEdit) {
+      const index = habits.findIndex(h => h.id === habitId);
+      if (index !== -1) {
+        habits[index] = {
+          ...habits[index], 
+          name, 
+          icon, 
+          color: selectedColor, 
+          goal, 
+          category
+        };
+        wx.showToast({ title: 'Habit Updated!', icon: 'success' });
+      } else {
+        wx.showToast({ title: 'Error: Habit not found', icon: 'none' });
+        return;
+      }
+    } else {
+      const newHabit = {
+        id: Date.now(),
+        name, 
+        icon, 
+        color: selectedColor, 
+        goal, 
+        category,
+        logs: []
+      };
+      habits.push(newHabit);
+      wx.showToast({ title: 'Habit Created!', icon: 'success' });
+    }
+
     wx.setStorageSync('habits', habits);
-    wx.showToast({ title: 'Habit Created!', icon: 'success' });
+    
     setTimeout(() => { wx.navigateBack(); }, 1000);
   }
 })

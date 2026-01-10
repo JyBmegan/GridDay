@@ -1,5 +1,5 @@
 <view class="container">
-  <view class="page-title">New Habit</view>
+  <view class="page-title">{{isEdit ? 'Edit Habit' : 'New Habit'}}</view>
 
   <view class="section">
     <view class="label">Habit Name</view>
@@ -77,6 +77,6 @@
   </view>
 
   <button class="save-btn" bindtap="saveHabit" style="background: {{selectedColor}}; box-shadow: 0 8px 20px {{selectedColor}}60;">
-    Start Tracking
+  {{isEdit ? 'Save Changes' : 'Start Tracking'}}
   </button>
 </view>

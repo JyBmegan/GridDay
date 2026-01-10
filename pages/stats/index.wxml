@@ -17,11 +17,19 @@
             </view>
             <view class="subtitle" style="font-size: 13px; color: #999; margin-top: 4px;">Review your habit cultivation</view>
         </view>
+    </view>
 
-        <view class="filter-trigger" catchtap="toggleDropdown" wx:if="{{categories.length > 0}}">
+    <view class="header-row">
+       <view class="range-nav-bar compact">
+          <view class="nav-btn" bindtap="prevRange" style="opacity: {{currentView==='all'?0:1}}">‹</view>
+          <view class="nav-text">{{dateRangeStr}}</view>
+          <view class="nav-btn" bindtap="nextRange" style="opacity: {{currentView==='all'?0:1}}">›</view>
+       </view>
+       
+       <view class="filter-trigger" catchtap="toggleDropdown" wx:if="{{categories.length > 0}}">
             <text class="filter-text">{{currentCategory}}</text>
             <view class="arrow-icon">▼</view>
-        </view>
+       </view>
     </view>
 
     <view class="dropdown-menu {{showDropdown ? 'show' : ''}}" catchtap="stopProp">
@@ -38,11 +46,12 @@
         </view>
     </view>
 
-    <view class="tabs-wrapper" wx:if="{{displayMode === 'trend'}}">
+    <view class="tabs-wrapper">
         <view class="tabs-box">
           <view class="tab {{currentView === 'week' ? 'active' : ''}}" bindtap="switchView" data-view="week">Week</view>
           <view class="tab {{currentView === 'month' ? 'active' : ''}}" bindtap="switchView" data-view="month">Month</view>
           <view class="tab {{currentView === 'year' ? 'active' : ''}}" bindtap="switchView" data-view="year">Year</view>
+          <view class="tab {{currentView === 'all' ? 'active' : ''}}" bindtap="switchView" data-view="all">All</view>
         </view>
     </view>
 
@@ -55,7 +64,7 @@
                     <view class="name-box">
                         <view class="name">{{habit.name}}</view>
                         <view class="count-text" style="color: '#5d5d5d'">
-                            {{displayMode==='trend' ? (currentView==='week'?habit.weekTotal:habit.monthTotal) : habit.totalCount}} 
+                            {{habit.displayTotal}}
                             <text class="unit-text"> times</text>
                         </view>
                     </view>
@@ -87,6 +96,15 @@
                                     <text class="year-month-num" style="color:{{m.isEmpty ? '#ccc' : '#fff'}}">{{index+1}}</text>
                                 </view>
                             </block>
+                        </view>
+
+                        <view class="chart-all" wx:if="{{currentView === 'all'}}" style="height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding-bottom: 20px;">
+                             <view style="font-size: 56px; font-weight: 800; color: {{habit.color}}; line-height: 1;">
+                                {{habit.displayTotal}}
+                             </view>
+                             <view style="font-size: 13px; color: #999; font-weight: 600; margin-top: 4px; letter-spacing: 1px; text-transform: uppercase;">
+                                Total Check-ins
+                             </view>
                         </view>
                     </block>
                     
@@ -120,9 +138,9 @@
 
     <view class="header-row">
        <view class="range-nav-bar compact">
-          <view class="nav-btn" bindtap="prevRange">‹</view>
+          <view class="nav-btn" bindtap="prevRange" style="opacity: {{currentView==='all'?0:1}}">‹</view>
           <view class="nav-text">{{dateRangeStr}}</view>
-          <view class="nav-btn" bindtap="nextRange">›</view>
+          <view class="nav-btn" bindtap="nextRange" style="opacity: {{currentView==='all'?0:1}}">›</view>
        </view>
        
        <view class="filter-trigger" catchtap="togglePlanDropdown">
@@ -143,6 +161,7 @@
           <view class="tab {{currentView === 'week' ? 'active' : ''}}" bindtap="switchView" data-view="week">Week</view>
           <view class="tab {{currentView === 'month' ? 'active' : ''}}" bindtap="switchView" data-view="month">Month</view>
           <view class="tab {{currentView === 'year' ? 'active' : ''}}" bindtap="switchView" data-view="year">Year</view>
+          <view class="tab {{currentView === 'all' ? 'active' : ''}}" bindtap="switchView" data-view="all">All</view>
         </view>
     </view>
 
