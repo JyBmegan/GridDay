@@ -123,9 +123,11 @@ Page({
   generateHeatmapData(logs, baseColor) {
     const weeksNeeded = 26; const daysPerWeek = 7; let heatmap = [];
     const today = new Date();
-    const dayOfWeek = today.getDay(); 
+    let currentDayIndex = today.getDay() || 7;
+    let daysToSunday = 7 - currentDayIndex;
+
     const endDate = new Date(today);
-    endDate.setDate(today.getDate() + (6 - dayOfWeek)); 
+    endDate.setDate(today.getDate() + daysToSunday);
     let currentDate = new Date(endDate);
     currentDate.setDate(currentDate.getDate() - (weeksNeeded * 7) + 1);
 

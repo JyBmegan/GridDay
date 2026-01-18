@@ -106,9 +106,7 @@ Page({
 
       for(let i=1; i<=lastDay.getDate(); i++) {
           const dateStr = `${year}-${month.toString().padStart(2,'0')}-${i.toString().padStart(2,'0')}`;
-          
-          // 检查这一天是否有 log
-          // 注意：logs 里的 time 是 ISO 格式 "2025-12-07T..."
+
           const logs = (this.data.habit.logs || []).filter(l => {
             const t = typeof l === 'string' ? l : l.time;
             return t && t.startsWith(dateStr);

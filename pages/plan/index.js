@@ -65,17 +65,22 @@ Page({
   },
 
   generateCalendarGrid(year, month) {
-    const firstDay = new Date(year, month - 1, 1).getDay(); 
+    let firstDayIndex = new Date(year, month - 1, 1).getDay(); 
+    let emptyDaysCount = firstDayIndex === 0 ? 6 : firstDayIndex - 1;
+
     const daysInMonth = new Date(year, month, 0).getDate();
     const allPlans = wx.getStorageSync('plans') || [];
     const days = [];
-    for (let i = 0; i < firstDay; i++) days.push({ empty: true });
+    
+    for (let i = 0; i < emptyDaysCount; i++) days.push({ empty: true });
+
     for (let i = 1; i <= daysInMonth; i++) {
       const dStr = `${year}-${month.toString().padStart(2,'0')}-${i.toString().padStart(2,'0')}`;
       const dayPlans = allPlans.filter(p => this.normalizeDate(p.date) === dStr);
       const dots = [...new Set(dayPlans.map(p => p.color))].slice(0, 3);
       days.push({ day: i, fullDate: dStr, dots });
     }
+    
     this.setData({ calendarDays: days });
   },
 

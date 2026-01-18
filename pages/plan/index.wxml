@@ -24,7 +24,13 @@
 
   <view class="calendar-wrapper">
     <view class="week-row">
-      <view class="week-cell" wx:for="{{weekdays}}" wx:key="*this">{{item}}</view>
+      <view class="week-cell">Mon</view>
+      <view class="week-cell">Tue</view>
+      <view class="week-cell">Wed</view>
+      <view class="week-cell">Thu</view>
+      <view class="week-cell">Fri</view>
+      <view class="week-cell">Sat</view>
+      <view class="week-cell">Sun</view>
     </view>
     <view class="days-grid">
       <block wx:for="{{calendarDays}}" wx:key="index">

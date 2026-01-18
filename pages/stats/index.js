@@ -340,7 +340,7 @@ Page({
     const anchor = new Date(this.data.anchorDate);
     const anchorYear = anchor.getFullYear();
     const anchorMonth = anchor.getMonth();
-    
+
     let startStr = '', endStr = '';
     let yLabels = []; let dataLength = 0; let getIndex = () => -1; let tHeight = 250;
 
@@ -372,6 +372,7 @@ Page({
         getIndex = (dateStr) => parseInt(dateStr.split('-')[1]) - 1;
         tHeight = 400;
     } else {
+        // All View
         startStr = '1900-01-01'; endStr = '2099-12-31';
         yLabels = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
         dataLength = 12;
@@ -392,45 +393,112 @@ Page({
         const sample = dateFilteredPlans.find(p => p.category === this.data.currentPlanCategory);
         if (sample && sample.color) targetColor = sample.color;
     }
-    const valMap = {}; const catMap = {}; const seriesMap = {}; const hourCounts = new Array(24).fill(0); const activeDaysSet = new Set();
-    let total = 0; let maxDailyDuration = 0; 
+
+    const valMap = {}; 
+    const catMap = {}; 
+    const seriesMap = {}; 
+    const hourCounts = new Array(24).fill(0); 
+    const activeDaysSet = new Set();
+    let total = 0; 
+    let maxDailyDuration = 0; 
+
     finalPlans.forEach(p => {
         let dur = parseFloat(p.duration);
-        if (isNaN(dur) || dur === 0) { const [sh, sm] = (p.startTime || '00:00').split(':').map(Number); const [eh, em] = (p.endTime || '00:00').split(':').map(Number); dur = (eh + em/60) - (sh + sm/60); if (dur < 0) dur += 24; }
+        if (isNaN(dur) || dur === 0) { 
+            const [sh, sm] = (p.startTime || '00:00').split(':').map(Number); 
+            const [eh, em] = (p.endTime || '00:00').split(':').map(Number); 
+            dur = (eh + em/60) - (sh + sm/60); 
+            if (dur < 0) dur += 24; 
+        }
         if (isNaN(dur)) dur = 0;
+
         const pDate = this.fmt(this.safeDate(p.date));
-        if(!valMap[pDate]) valMap[pDate] = 0; valMap[pDate] += dur; if(dur > 0) activeDaysSet.add(pDate);
+        if(!valMap[pDate]) valMap[pDate] = 0; 
+        valMap[pDate] += dur; 
+        if(dur > 0) activeDaysSet.add(pDate);
         if(valMap[pDate] > maxDailyDuration) maxDailyDuration = valMap[pDate];
         total += dur;
-        if (!catMap[p.category]) catMap[p.category] = { name: p.category, value: 0, color: p.color || '#5d5d5d' }; catMap[p.category].value += dur;
+        
+        if (!catMap[p.category]) catMap[p.category] = { name: p.category, value: 0, color: p.color || '#5d5d5d' }; 
+        catMap[p.category].value += dur;
+        
         if (!seriesMap[p.category]) seriesMap[p.category] = new Array(dataLength).fill(0);
-        const idx = getIndex(pDate); if (idx >= 0 && idx < dataLength) seriesMap[p.category][idx] += dur;
-        const s = parseInt((p.startTime||'00:00').split(':')[0]); const e = parseInt((p.endTime||'00:00').split(':')[0]); for(let h=s; h<=e; h++) if(h<24) hourCounts[h]++;
+        const idx = getIndex(pDate); 
+        if (idx >= 0 && idx < dataLength) seriesMap[p.category][idx] += dur;
+        
+        const s = parseInt((p.startTime||'00:00').split(':')[0]); 
+        const e = parseInt((p.endTime||'00:00').split(':')[0]); 
+        for(let h=s; h<=e; h++) if(h<24) hourCounts[h]++;
     });
+    
     if (maxDailyDuration === 0) maxDailyDuration = 1;
 
-    let heatmapGrid = []; let isYearView = (view === 'year');
-    const getCellStyle = (val, isCurrent) => { if (!isCurrent) return { color: 'transparent', opacity: 0 }; if (val === 0) return { color: '#ebedf0', opacity: 1 }; let ratio = val / maxDailyDuration; let opacity = 0.3 + (ratio * 0.7); if (opacity > 1) opacity = 1; return { color: targetColor, opacity: opacity.toFixed(2) }; };
+    let heatmapGrid = []; 
+    let isYearView = (view === 'year');
+    
+    const getCellStyle = (val, isCurrent) => { 
+        if (!isCurrent) return { color: 'transparent', opacity: 0 }; 
+        if (val === 0) return { color: '#ebedf0', opacity: 1 }; 
+        let ratio = val / maxDailyDuration; 
+        let opacity = 0.3 + (ratio * 0.7); 
+        if (opacity > 1) opacity = 1; 
+        return { color: targetColor, opacity: opacity.toFixed(2) }; 
+    };
     
     if (view === 'year') {
-        isYearView = true; let dIter = new Date(anchorYear, 0, 1); const startDay = dIter.getDay() || 7; dIter.setDate(dIter.getDate() - startDay + 1); 
-        for(let i=0; i<371; i++) { const dStr = this.fmt(dIter); const val = valMap[dStr] || 0; heatmapGrid.push({ value: val, ...getCellStyle(val, dIter.getFullYear() === anchorYear) }); dIter.setDate(dIter.getDate() + 1); }
+        isYearView = true; 
+        let dIter = new Date(anchorYear, 0, 1); 
+        const startDay = dIter.getDay() || 7; 
+        dIter.setDate(dIter.getDate() - startDay + 1); 
+        
+        for(let i=0; i<371; i++) { 
+            const dStr = this.fmt(dIter); 
+            const val = valMap[dStr] || 0; 
+            const isCurrentYear = dIter.getFullYear() === anchorYear;
+            heatmapGrid.push({ value: val, ...getCellStyle(val, isCurrentYear) }); 
+            dIter.setDate(dIter.getDate() + 1); 
+        }
     } else {
         isYearView = false;
-        if (view === 'month') { const firstDay = new Date(anchorYear, anchorMonth, 1); let dayOfWeek = firstDay.getDay(); if(dayOfWeek===0) dayOfWeek=7; for(let i=1; i<dayOfWeek; i++) heatmapGrid.push({ empty: true }); const loopLimit = new Date(anchorYear, anchorMonth+1, 0).getDate(); for(let i=1; i<=loopLimit; i++) { const dStr = `${anchorYear}-${this.pad(anchorMonth+1)}-${this.pad(i)}`; const val = valMap[dStr] || 0; heatmapGrid.push({ value: val, ...getCellStyle(val, true) }); } }
-        else { const day = anchor.getDay() || 7; const dIter = new Date(anchor); dIter.setDate(dIter.getDate() - day + 1); for(let i=0; i<7; i++) { const dStr = this.fmt(dIter); const val = valMap[dStr] || 0; heatmapGrid.push({ value: val, ...getCellStyle(val, true) }); dIter.setDate(dIter.getDate() + 1); } }
+        if (view === 'month') { 
+            const firstDay = new Date(anchorYear, anchorMonth, 1); 
+            let dayOfWeek = firstDay.getDay() || 7; // Mon=1..Sun=7
+            for(let i=1; i<dayOfWeek; i++) heatmapGrid.push({ empty: true }); 
+            const loopLimit = new Date(anchorYear, anchorMonth+1, 0).getDate(); 
+            for(let i=1; i<=loopLimit; i++) { 
+                const dStr = `${anchorYear}-${this.pad(anchorMonth+1)}-${this.pad(i)}`; 
+                const val = valMap[dStr] || 0; 
+                heatmapGrid.push({ value: val, ...getCellStyle(val, true) }); 
+            } 
+        } else { 
+            const day = anchor.getDay() || 7; 
+            const dIter = new Date(anchor); dIter.setDate(dIter.getDate() - day + 1); 
+            for(let i=0; i<7; i++) { 
+                const dStr = this.fmt(dIter); 
+                const val = valMap[dStr] || 0; 
+                heatmapGrid.push({ value: val, ...getCellStyle(val, true) }); 
+                dIter.setDate(dIter.getDate() + 1); 
+            } 
+        }
     }
-
     const pieData = Object.values(catMap).map(c => ({...c, hours: c.value.toFixed(1), percent: total>0?Math.round(c.value/total*100):0})).sort((a,b)=>b.value-a.value);
     const series = Object.keys(seriesMap).map(cat => ({ name: cat, type: 'bar', stack: 'total', barWidth: view==='month'?'50%':'60%', itemStyle: { color: catMap[cat].color, borderRadius: 0 }, data: seriesMap[cat].map(v=>parseFloat(v.toFixed(1))) }));
-    const avgDur = dataLength > 0 ? (total / dataLength).toFixed(1) : 0; const topCat = pieData.length>0 ? pieData[0].name : '-'; const maxHourVal = Math.max(...hourCounts); const peakHour = hourCounts.indexOf(maxHourVal);
+    const avgDur = dataLength > 0 ? (total / dataLength).toFixed(1) : 0; 
+    const topCat = pieData.length>0 ? pieData[0].name : '-'; 
+    const maxHourVal = Math.max(...hourCounts); 
+    const peakHour = hourCounts.indexOf(maxHourVal);
 
     this.setData({
         planCategories: pieData, heatmapGrid, isYearView, trendHeight: tHeight, planFilterCats: uniqueCatsInView, 
         planSummary: { totalHours: total.toFixed(1), count: finalPlans.length, activeDays: activeDaysSet.size, topCat },
         footerData: { heatmap: { label1: 'Active Days', val1: activeDaysSet.size, label2: 'Total Hours', val2: total.toFixed(1) }, trend: { label1: 'Daily Average', val1: avgDur+'h', label2: 'Top Category', val2: topCat }, dist: { label1: 'Categories', val1: pieData.length, label2: 'Coverage', val2: '100%' }, curve: { label1: 'Peak Hour', val1: maxHourVal>0?`${peakHour}:00`:'-', label2: 'Intensity', val2: maxHourVal } }
     });
-    setTimeout(() => { this.initPlanBar(yLabels, series, view); this.initPlanPie(); this.initPlanCurve(hourCounts); }, 200);
+    
+    setTimeout(() => { 
+        this.initPlanBar(yLabels, series, view); 
+        this.initPlanPie(); 
+        this.initPlanCurve(hourCounts); 
+    }, 200);
   },
 
   initPlanBar(yLabels, series, view) {
