@@ -77,8 +77,12 @@
                 data-type="top"></view>
 
           <view class="block-content">
-            <view class="block-title">
-              <text style="margin-right:4px;" wx:if="{{item.icon}}">{{item.icon}}</text>{{item.title}}
+            <view class="block-title" style="display: flex; align-items: center;">
+              <block wx:if="{{item.icon}}">
+                <image wx:if="{{item.icon.length > 10}}" src="{{item.icon}}" style="width: 16px; height: 16px; margin-right: 4px; border-radius: 3px; flex-shrink: 0;" />
+                <text wx:else style="margin-right:4px;">{{item.icon}}</text>
+              </block>
+              <text style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{item.title}}</text>
             </view>
             <view class="block-time">{{item.startTime}} - {{item.endTime}}</view>
           </view>

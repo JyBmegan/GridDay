@@ -11,6 +11,7 @@
         "add/index",
         "detail/index",
         "plan_add/index",
+        "draw_icon/index",
         "help/index"
       ]
     }

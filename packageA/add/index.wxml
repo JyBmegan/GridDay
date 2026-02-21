@@ -36,7 +36,15 @@
   </view>
 
   <view class="section">
-    <view class="label">Icon <text wx:if="{{icon}}" style="font-size:16px; margin-left:10px;">  - Selected: {{icon}}</text></view>
+    <view class="label">
+        Icon 
+        <view wx:if="{{icon}}" style="display:inline-flex; align-items:center; margin-left:10px;">
+            <text style="font-size:16px; margin-right:5px;">- Selected:</text>
+            
+            <image wx:if="{{isCustomIcon || icon.length > 10}}" src="{{icon}}" style="width: 24px; height: 24px; border-radius: 4px;" />
+            <text wx:else style="font-size: 18px;">{{icon}}</text>
+        </view>
+    </view>
     <view class="emoji-grid">
       <view 
         wx:for="{{emojis}}" 
@@ -47,6 +55,10 @@
         style="border-color: {{icon === item ? selectedColor : 'transparent'}}; background: {{icon === item ? selectedColor + '20' : '#fff'}};"
       >
         {{item}}
+      </view>
+      
+      <view class="emoji-item draw-btn" bindtap="goToDrawIcon">
+        +
       </view>
     </view>
   </view>

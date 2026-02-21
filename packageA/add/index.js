@@ -51,9 +51,7 @@ Page({
 
     selectedColor: '#ff9f43',
 
-    emojis: [ '💻', '💼', '📅', '📊', '📝', '📁', '📌', '📎', 
-    '📞', '📧', '🗑️', '🖨️', '📈', '💡', '🧠', '⌚', '🏠', '🛒', '🛍️', '💵', '💳', '📦', '🔑', '🧹', '🍽️', '☕', '🚿', '🛌', '🛋️', '🧺', '🪴', '🔌', '🏃', '🏋️', '🧘', '🚲', '🏊', '🏀', '👣', '💊', '🩺', '🩹', '💧', '🍎', '🥗', '🏋️‍♀️', '🧗', '🥊', '🚗', '✈️', '🚇', '🚌', '⛽', '🗺️', '🚦', '🎉', 
-    '🎂', '🎁', '🎮', '🎧', '📖', '🎨', '🏖️', '🍿', '⚙️', '🔍', '🔔', '✅', '❌', '⚠️', '❤️', '⭐', '🔒', '👀', '🔥', '⚡', '🚫', '📢', '💬', '➕']
+    emojis: [ '💻', '💼', '📅', '📊', '📝', '📌',  '📈', '💡', '🧠',  '🏠', '🛒', '🛍️', '🧹', '🍽️', '☕', '🚿', '🛌', '🏃', '🏋️', '🧘', '🚲', '🏊', '👣', '💊', '🩺', '💧', '🥗', '🏋️‍♀️', '🚗', '✈️', '🚇', '🚌',  '🗺️',  '🎉', '🎂', '🎁', '🎮', '🎧', '📖', '🎨', '🏖️', '🍿',  '🔍', '🔔',  '❤️', '⭐', '🔒',  '💬']
   },
 
   onLoad(options) {
@@ -67,6 +65,17 @@ Page({
     }
   },
 
+  goToDrawIcon() {
+    wx.navigateTo({ url: '/packageA/draw_icon/index' });
+  },
+
+  selectEmoji(e) { 
+    this.setData({ 
+        icon: e.currentTarget.dataset.emoji,
+        isCustomIcon: false
+    }); 
+  },
+
   loadHabitData(id) {
     const habits = wx.getStorageSync('habits') || [];
     const target = habits.find(h => h.id == id); 
@@ -78,6 +87,7 @@ Page({
         icon: target.icon,
         selectedColor: target.color,
         goal: target.goal || 1,
+        isCustomIcon: target.icon && target.icon.startsWith('data:image'),
         category: target.category || '',
         categoryList: this.ensureCategoryExists(target.category)
       });

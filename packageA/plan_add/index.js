@@ -50,9 +50,7 @@ Page({
 
     selectedColor: '#54a0ff', // 默认选中颜色
     
-    emojis: [ '💻', '💼', '📅', '📊', '📝', '📁', '📌', '📎', 
-    '📞', '📧', '🗑️', '🖨️', '📈', '💡', '🧠', '⌚', '🏠', '🛒', '🛍️', '💵', '💳', '📦', '🔑', '🧹', '🍽️', '☕', '🚿', '🛌', '🛋️', '🧺', '🪴', '🔌', '🏃', '🏋️', '🧘', '🚲', '🏊', '🏀', '👣', '💊', '🩺', '🩹', '💧', '🍎', '🥗', '🏋️‍♀️', '🧗', '🥊', '🚗', '✈️', '🚇', '🚌', '⛽', '🗺️', '🚦', '🎉', 
-    '🎂', '🎁', '🎮', '🎧', '📖', '🎨', '🏖️', '🍿', '⚙️', '🔍', '🔔', '✅', '❌', '⚠️', '❤️', '⭐', '🔒', '👀', '🔥', '⚡', '🚫', '📢', '💬', '➕'],
+    emojis: [ '💻', '💼', '📅', '📊', '📝', '📌',  '📈', '💡', '🧠',  '🏠', '🛒', '🛍️', '🧹', '🍽️', '☕', '🚿', '🛌', '🏃', '🏋️', '🧘', '🚲', '🏊', '👣', '💊', '🩺', '💧', '🥗', '🏋️‍♀️', '🚗', '✈️', '🚇', '🚌',  '🗺️',  '🎉', '🎂', '🎁', '🎮', '🎧', '📖', '🎨', '🏖️', '🍿',  '🔍', '🔔',  '❤️', '⭐', '🔒',  '💬'],
     icon: '📅', // 默认图标
 
 // 传入开始时间 (HH:mm)，返回1小时后的时间 (HH:mm)
@@ -154,6 +152,7 @@ Page({
             category: target.category,
             selectedColor: target.color,
             icon: target.icon,
+            isCustomIcon: target.icon && target.icon.startsWith('data:image'),
             categories: this.ensureCategoryExists(target.category, this.data.categories)
         });
     }
@@ -320,12 +319,19 @@ Page({
     }
   },
 
-  selectEmoji(e) { 
-    const icon = e.currentTarget.dataset.emoji;
-    this.setData({ icon: icon });
+  goToDrawIcon() {
+    wx.navigateTo({ url: '/packageA/draw_icon/index' });
+  },
 
-    if (this.data.category) {
-        this.saveCatSettings(this.data.category, this.data.selectedColor, icon);
+  selectEmoji(e) { 
+  const icon = e.currentTarget.dataset.emoji;
+  this.setData({ 
+      icon: icon,
+      isCustomIcon: false
+  });
+
+  if (this.data.category) {
+      this.saveCatSettings(this.data.category, this.data.selectedColor, icon);
     }
   },
 

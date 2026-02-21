@@ -1,0 +1,74 @@
+<view class="container">
+  <view class="header">
+    <view class="title">Design Icon</view>
+    <view class="subtitle">Draw your own custom icon</view>
+  </view>
+
+  <view class="canvas-wrapper {{currentBgColor === 'transparent' ? 'transparent-bg' : ''}}" style="background-color: {{currentBgColor === 'transparent' ? '' : currentBgColor}};">
+    <canvas type="2d" id="drawCanvas" class="draw-canvas" bindtouchstart="touchStart" bindtouchmove="touchMove" bindtouchend="touchEnd"></canvas>
+  </view>
+
+  <view class="main-tools">
+    <view class="tool-row">
+      <view class="tool-btn {{!isEraser ? 'active' : ''}}" bindtap="setTool" data-tool="pen">✒️ Brush</view>
+      <view class="tool-btn {{isEraser ? 'active' : ''}}" bindtap="setTool" data-tool="eraser">🧹 Eraser</view>
+      <view class="tool-btn clear" bindtap="clearCanvas">🗑️ Clear</view>
+    </view>
+
+    <view class="slider-row" wx:if="{{!isEraser}}">
+      <text class="slider-label">Size: {{brushSize}}</text>
+      <slider class="slider-bar" min="2" max="40" value="{{brushSize}}" bindchanging="onBrushSizeChange" bindchange="onBrushSizeChange" activeColor="#333333" block-size="16"/>
+    </view>
+
+    <view class="color-selectors">
+      <view class="color-picker-btn" bindtap="openPalette" data-tab="pen">
+        <text class="btn-txt">Brush Color</text>
+        <view class="color-dot" style="background: {{currentColor}}"></view>
+      </view>
+      <view class="color-picker-btn" bindtap="openPalette" data-tab="bg">
+        <text class="btn-txt">Background</text>
+        <view class="color-dot {{currentBgColor === 'transparent' ? 'transparent-bg' : ''}}" style="background: {{currentBgColor}}"></view>
+      </view>
+    </view>
+    
+    <button class="save-btn" bindtap="saveIcon">Use Icon</button>
+  </view>
+
+  <view class="mask" wx:if="{{showPalette}}" bindtap="closePalette"></view>
+  <view class="bottom-sheet {{showPalette ? 'show' : ''}}">
+    <view class="sheet-header">
+      <view class="tabs">
+        <view class="tab {{activeTab === 'pen' ? 'active' : ''}}" bindtap="switchTab" data-tab="pen">Brush</view>
+        <view class="tab {{activeTab === 'bg' ? 'active' : ''}}" bindtap="switchTab" data-tab="bg">Background</view>
+      </view>
+      <view class="close-btn" bindtap="closePalette">✕</view>
+    </view>
+
+    <view wx:if="{{activeTab === 'bg'}}" class="transparent-btn {{currentBgColor === 'transparent' ? 'active' : ''}}" bindtap="selectBg" data-color="transparent">
+      🏁 Transparent Background
+    </view>
+
+    <scroll-view scroll-y class="color-grid-scroll">
+      <view class="color-grid">
+        <view wx:for="{{palette}}" wx:key="*this" 
+              class="color-swatch {{(activeTab==='pen'?currentColor:currentBgColor) === item && !isEraser ? 'active' : ''}} {{item === 'transparent' ? 'transparent-bg' : ''}}" 
+              style="background: {{item}};" 
+              bindtap="{{activeTab==='pen' ? 'selectColor' : 'selectBg'}}" 
+              data-color="{{item}}"></view>
+        <view class="color-swatch add-color-btn" bindtap="openCustomColorPicker">+</view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <view class="mask" style="z-index: 100;" wx:if="{{showCustomPicker}}" bindtap="closeCustomColorPicker"></view>
+  <view class="bottom-sheet custom-color-sheet {{showCustomPicker ? 'show' : ''}}" style="z-index: 101;">
+    <view class="picker-header">Custom Color</view>
+    <view class="color-preview" style="background: {{customColorPreview}}"></view>
+
+    <view class="slider-group"><view class="slider-label">Hue</view><slider min="0" max="360" value="{{customH}}" bindchanging="onSliderChange" bindchange="onSliderChange" data-type="H" activeColor="#333333" block-size="18"/></view>
+    <view class="slider-group"><view class="slider-label">Saturation</view><slider min="0" max="100" value="{{customS}}" bindchanging="onSliderChange" bindchange="onSliderChange" data-type="S" activeColor="#333333" block-size="18"/></view>
+    <view class="slider-group"><view class="slider-label">Lightness</view><slider min="0" max="100" value="{{customL}}" bindchanging="onSliderChange" bindchange="onSliderChange" data-type="L" activeColor="#333333" block-size="18"/></view>
+
+    <button class="confirm-color-btn" bindtap="confirmCustomColor">Add Color</button>
+  </view>
+</view>

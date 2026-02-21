@@ -1,7 +1,10 @@
 <view class="container">
   
   <view class="header-simple" style="display: flex; justify-content: center; flex-direction: column; align-items: center; margin-bottom: 20px;">
-    <view class="big-icon" style="font-size: 32px; margin-bottom: 5px;">{{habit.icon}}</view>
+    <view class="big-icon" style="margin-bottom: 5px; display: flex; justify-content: center; align-items: center; height: 48px;">
+      <image wx:if="{{habit.icon.length > 10}}" src="{{habit.icon}}" style="width: 48px; height: 48px; border-radius: 8px;" />
+      <text wx:else style="font-size: 32px;">{{habit.icon}}</text>
+    </view>
     <view class="big-name" style="font-size: 24px; font-weight: 800; color: #333;">{{habit.name}}</view>
   </view>
 

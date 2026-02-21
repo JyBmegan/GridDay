@@ -60,7 +60,10 @@
           <block wx:for="{{filteredHabits}}" wx:key="id" wx:for-item="habit">
             <view class="stat-card" bindtap="goToDetail" data-id="{{habit.id}}">
                 <view class="card-header">
-                    <view class="icon-box" style="background: {{habit.color}}15;">{{habit.icon}}</view>
+                  <view class="icon-box" style="background: {{habit.color}}15; display: flex; align-items: center; justify-content: center;">
+                    <image wx:if="{{habit.icon.length > 10}}" src="{{habit.icon}}" style="width: 20px; height: 20px; border-radius: 4px;" />
+                    <text wx:else>{{habit.icon}}</text>
+                  </view>
                     <view class="name-box">
                         <view class="name">{{habit.name}}</view>
                         <view class="count-text" style="color: '#5d5d5d'">
