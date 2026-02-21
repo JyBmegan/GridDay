@@ -26,26 +26,6 @@
     </view>
   </view>
 
-  <view class="section-title">
-      Icon
-      <view wx:if="{{icon}}" style="display:inline-flex; align-items:center; margin-left:10px; font-weight: normal; color: #333;">
-            <text style="font-size:12px; margin-right:5px; color:#999;">- Selected:</text>
-            <image wx:if="{{isCustomIcon || icon.length > 10}}" src="{{icon}}" style="width: 20px; height: 20px; border-radius: 4px;" />
-            <text wx:else style="font-size: 16px;">{{icon}}</text>
-      </view>
-  </view>
-  <view class="emoji-grid">
-    <view wx:for="{{emojis}}" wx:key="*this" bindtap="selectEmoji" data-emoji="{{item}}" 
-          class="emoji-item {{icon === item ? 'selected' : ''}}" 
-          style="border-color: {{icon === item ? selectedColor : 'transparent'}}; background: {{icon === item ? selectedColor + '20' : '#fff'}};">
-      {{item}}
-    </view>
-    
-    <view class="emoji-item draw-btn" bindtap="goToDrawIcon">
-        +
-    </view>
-  </view>
-
   <view class="category-wrapper">
     <view class="category-list">
       <view wx:for="{{categories}}" wx:key="*this"
@@ -96,18 +76,6 @@
       {{item}}
     </view>
     <view class="emoji-item draw-btn" bindtap="goToDrawIcon">+</view>
-  </view>
-  <view class="section-title">Color</view> 
-  <view class="color-list-inline">
-    <view 
-      wx:for="{{colors}}" 
-      wx:key="*this" 
-      bindtap="selectColor" 
-      data-color="{{item}}"
-      class="color-item-inline" 
-      style="background: {{item}};">
-      <view wx:if="{{selectedColor === item}}" class="check-mark">✓</view>
-    </view>
   </view>
 
   <view class="section-title">Color</view> 
