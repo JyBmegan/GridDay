@@ -41,7 +41,7 @@
         <view wx:if="{{icon}}" style="display:inline-flex; align-items:center; margin-left:10px;">
             <text style="font-size:16px; margin-right:5px;">- Selected:</text>
             
-            <image wx:if="{{isCustomIcon || icon.length > 10}}" src="{{icon}}" style="width: 24px; height: 24px; border-radius: 4px;" />
+            <image wx:if="{{isCustomIcon || isCustomIcon}}" src="{{icon}}" style="width: 24px; height: 24px; border-radius: 4px;" />
             <text wx:else style="font-size: 18px;">{{icon}}</text>
         </view>
     </view>

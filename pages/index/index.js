@@ -57,6 +57,7 @@ Page({
         heatmap: this.generateHeatmapData(h.logs, h.color),
 
         hoursData: hoursData, 
+        isCustomIcon: !!(h.icon && typeof h.icon === 'string' && h.icon.index0f('data:image') !== -1),
         ec: { lazyLoad: true } 
       };
     });
@@ -191,6 +192,7 @@ Page({
       success: (res) => {
         if (res.confirm) {
           let habits = wx.getStorageSync('habits') || [];
+          // console.log("【真机数据大检查】", habits);
           const newHabits = habits.filter(h => h.id !== id);
           wx.setStorageSync('habits', newHabits);
           
